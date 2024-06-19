@@ -1,12 +1,11 @@
 package com.sparta.heartvera.domain.user.entity;
 
 import com.sparta.heartvera.common.Timestamped;
+import com.sparta.heartvera.domain.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -29,22 +28,25 @@ public class User extends Timestamped {
     private String userName;
 
     @Email
-    @Column(name = "user_email")
+    @Column(name = "email")
     private String userEmail;
 
-    @Column(name = "user_intro")
-    private String userIntro;
-
-    @Column(name = "user_status")
-    private String userStatus;
-
-    @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private UserRoleEnum role;
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "status_modified")
-    private LocalDateTime statusModified;
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private UserRoleEnum authority;
+
+    public void updateUser(UserUpdateDto updateDto) {
+        this.userName = updateDto.getUserName();
+        this.description = updateDto.getDescription();
+    }
+
+    public void updatePassword(String newPassword) {
+        this.userPassword = newPassword;
+    }
 }
