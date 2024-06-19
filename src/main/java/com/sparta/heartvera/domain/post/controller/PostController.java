@@ -26,4 +26,9 @@ public class PostController {
     public ResponseEntity getPost(@PathVariable Long postId) {
         return ResponseEntity.status(HttpStatus.OK).body(postService.getPost(postId));
     }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity editPost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.editPost(postId, requestDto, userDetails.getUser()));
+    }
 }
