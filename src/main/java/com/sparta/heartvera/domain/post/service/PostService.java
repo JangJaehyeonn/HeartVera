@@ -6,6 +6,10 @@ import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.repository.PostRepository;
 import com.sparta.heartvera.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +46,18 @@ public class PostService {
         postRepository.delete(post);
 
         return postId + "번 게시물 삭제 완료";
+    }
+
+    public Object getAllPost(int page) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page, 5, sort);
+        Page<Post> postList = postRepository.findAll(pageable);
+
+        if (postList.getTotalElements() == 0) {
+            return "아직 등록된 게시물이 없습니다.";
+        }
+
+        return postList.map(PostResponseDto::new);
     }
 
     public Post findById(Long postId) {

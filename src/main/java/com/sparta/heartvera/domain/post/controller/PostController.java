@@ -36,4 +36,9 @@ public class PostController {
     public ResponseEntity deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(postService.deletePost(postId, userDetails.getUser()));
     }
+
+    @GetMapping("/")
+    public ResponseEntity getAllPost(@RequestParam("page") int page) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPost(page - 1));
+    }
 }
