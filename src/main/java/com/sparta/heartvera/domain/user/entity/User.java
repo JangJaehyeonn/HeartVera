@@ -4,13 +4,14 @@ import com.sparta.heartvera.common.Timestamped;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
 @Table(name = "users")
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // Builder 사용시 필요한 AllArgsConstructor
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,22 +30,17 @@ public class User extends Timestamped {
     private String userName;
 
     @Email
-    @Column(name = "user_email")
+    @Column(name = "email")
     private String userEmail;
 
-    @Column(name = "user_intro")
-    private String userIntro;
-
-    @Column(name = "user_status")
-    private String userStatus;
-
-    @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private UserRoleEnum role;
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "status_modified")
-    private LocalDateTime statusModified;
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private UserRoleEnum authority;
+
 }
