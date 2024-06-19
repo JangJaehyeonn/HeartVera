@@ -36,6 +36,14 @@ public class PostService {
         return new PostResponseDto(post);
     }
 
+    public String deletePost(Long postId, User user) {
+        Post post = findById(postId);
+        checkUserSame(post, user);
+        postRepository.delete(post);
+
+        return postId + "번 게시물 삭제 완료";
+    }
+
     public Post findById(Long postId) {
         return postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
