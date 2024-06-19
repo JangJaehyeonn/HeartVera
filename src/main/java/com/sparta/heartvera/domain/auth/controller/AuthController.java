@@ -1,8 +1,10 @@
 package com.sparta.heartvera.domain.auth.controller;
 
+import com.sparta.heartvera.domain.auth.dto.LoginRequestDto;
 import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
 import com.sparta.heartvera.domain.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,12 @@ public class AuthController {
     @PostMapping(value = "/signup")
     public ResponseEntity<String> signup(@RequestBody @Valid SignupRequestDto requestDto){
         return authService.signup(requestDto);
+    }
+    
+    //로그인만들기 - 성공시 엑세스토큰 발급까지
+    @PostMapping(value = "/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto , HttpServletResponse res){
+        return authService.login(loginRequestDto, res);
     }
 
 }

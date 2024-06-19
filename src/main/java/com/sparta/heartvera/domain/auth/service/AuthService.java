@@ -1,10 +1,12 @@
 package com.sparta.heartvera.domain.auth.service;
 
+import com.sparta.heartvera.domain.auth.dto.LoginRequestDto;
 import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
 import com.sparta.heartvera.domain.user.entity.User;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.security.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +71,22 @@ public class AuthService {
         } else {
             return ResponseEntity.status(HttpStatus.OK)
                     .body("일반 사용자로 회원가입이 성공적으로 완료되었습니다.");
+        }
+    }
+
+    public ResponseEntity<String> login(LoginRequestDto loginRequestDto, HttpServletResponse res) {
+
+        Optional<User> existingUser = userRepository.findByUserId(loginRequestDto.getUserId());
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            String token = jwtUtil.createAccessToken(user.getUserName(),user.getAuthority());
+            jwtUtil.addAccessJwtToHeader(token, res);
+            
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("로그인 성공");
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("아이디가 틀립니다.");
         }
     }
 }
