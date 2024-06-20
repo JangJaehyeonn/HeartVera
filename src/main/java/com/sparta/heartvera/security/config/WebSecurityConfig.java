@@ -1,5 +1,6 @@
 package com.sparta.heartvera.security.config;
 
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.security.filter.JwtAuthorizationFilter;
 import com.sparta.heartvera.security.service.UserDetailsServiceImpl;
 import com.sparta.heartvera.security.util.JwtUtil;
@@ -52,6 +53,7 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/admin").hasRole(UserRoleEnum.ADMIN.toString()) // admin 유저만 접근 가능하도록 설정
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         // swagger 허용
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-resources/**, ").permitAll()
