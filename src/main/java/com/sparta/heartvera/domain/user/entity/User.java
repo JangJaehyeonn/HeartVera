@@ -43,4 +43,7 @@ public class User extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum authority;
 
+    public void setRefreshToken(String token) {
+        this.refreshToken = token;
+    }
 }
