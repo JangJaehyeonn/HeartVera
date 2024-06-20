@@ -10,15 +10,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 
 @Entity
 @Table(name = "pw_history")
 @Getter
 @NoArgsConstructor
 public class PasswordHistory {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "pw_history_id")
@@ -29,15 +30,16 @@ public class PasswordHistory {
   private User user;
 
   @Column(name = "used_password", nullable = false)
-  private String usedPassword;
+  private String password;
 
-  @Column(name = "change_date", nullable = false)
-  private LocalDateTime changeDate;
+  @Column(nullable = false)
+  private LocalDateTime changedAt;
 
-  public PasswordHistory(User user, String usedPassword, LocalDateTime changeDate) {
+  public PasswordHistory(User user, String password, LocalDateTime changedAt) {
     this.user = user;
-    this.usedPassword = usedPassword;
-    this.changeDate = changeDate;
+    this.password = password;
+    this.changedAt = changedAt;
   }
-
 }
+
+
