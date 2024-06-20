@@ -54,6 +54,7 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/pubposts/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole(UserRoleEnum.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         // swagger 허용
