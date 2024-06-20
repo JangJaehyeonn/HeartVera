@@ -13,4 +13,12 @@ public class AdminService {
     public Object getAllPost(int page) {
         return postService.getAllPostForAdmin(page);
     }
+
+
+    public Post editPost(Long postId, PostRequestDto requestDto) {
+        Post post = postService.findById(postId);
+        post.update(requestDto);
+
+        return post;
+    }
 }

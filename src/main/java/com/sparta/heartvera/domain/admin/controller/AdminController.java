@@ -18,4 +18,9 @@ public class AdminController {
     public ResponseEntity getAllPost(@RequestParam int page) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPost(page));
     }
+
+    @PatchMapping("/post/{postId}")
+    public ResponseEntity editPost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.editPost(postId, requestDto));
+    }
 }
