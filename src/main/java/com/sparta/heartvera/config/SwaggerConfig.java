@@ -28,8 +28,8 @@ public class SwaggerConfig {
 
     private Info getInfo(){
         return new Info()
-                .title("Newsfeed API")
+                .title("HeartVera API")
                 .version("1.0")
-                .description("Newsfeed API");
+                .description("HeartVera API");
     }
 }
