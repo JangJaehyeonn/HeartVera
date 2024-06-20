@@ -3,12 +3,14 @@ package com.sparta.heartvera.domain.admin.service;
 import com.sparta.heartvera.domain.post.dto.PostRequestDto;
 import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.service.PostService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AdminService {
 
-    PostService postService;
+    private final PostService postService;
 
     public Object getAllPost(int page) {
         return postService.getAllPostForAdmin(page);
