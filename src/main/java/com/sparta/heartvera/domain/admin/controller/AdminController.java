@@ -14,18 +14,33 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @GetMapping("/post")
+    @GetMapping("/posts")
     public ResponseEntity getAllPost(@RequestParam int page) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPost(page));
     }
 
-    @PatchMapping("/post/{postId}")
+    @PatchMapping("/posts/{postId}")
     public ResponseEntity editPost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.editPost(postId, requestDto));
     }
 
-    @DeleteMapping("/post/{postId}")
+    @DeleteMapping("/posts/{postId}")
     public ResponseEntity deletePost(@PathVariable Long postId) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.deletePost(postId));
+    }
+
+    @GetMapping("/pubposts")
+    public ResponseEntity getAllPublicPost(@RequestParam int page) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPublicPost(page));
+    }
+
+    @PatchMapping("/pubposts/{postId}")
+    public ResponseEntity editPublicPost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.editPublicPost(postId, requestDto));
+    }
+
+    @DeleteMapping("/pubposts/{postId}")
+    public ResponseEntity deletePublicPost(@PathVariable Long postId) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.deletePublicPost(postId));
     }
 }

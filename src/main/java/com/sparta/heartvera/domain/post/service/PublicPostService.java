@@ -75,4 +75,20 @@ public class PublicPostService {
             throw new CustomException(ErrorCode.POST_NOT_USER);
         }
     }
+
+    public Object getAllPostForAdmin(int page) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        Page<PublicPost> postList = postRepository.findAll(pageable);
+
+        if (postList.getTotalElements() == 0) {
+            return "아직 등록된 게시물이 없습니다.";
+        }
+
+        return postList;
+    }
+
+    public void delete(PublicPost post) {
+        postRepository.delete(post);
+    }
 }
