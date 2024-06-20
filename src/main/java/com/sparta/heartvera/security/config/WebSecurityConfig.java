@@ -25,11 +25,13 @@ public class WebSecurityConfig {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final UserRepository userRepository;
 
-    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration) {
+    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
+        this.userRepository = userRepository;
     }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -78,7 +80,7 @@ public class WebSecurityConfig {
     // JWT 인증 필터를 빈으로 정의
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         // 이 필터는 JWT를 사용하여 인증을 처리하며, 인증 관리자를 설정
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,userRepository);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         filter.setFilterProcessesUrl("/api/auth/login"); // 로그인 엔드포인트를 설정 (특정 작업을 수행하기 위해 서버에 요청을 보내는 url)
         return filter;
