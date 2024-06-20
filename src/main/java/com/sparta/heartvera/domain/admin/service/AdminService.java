@@ -21,4 +21,11 @@ public class AdminService {
 
         return post;
     }
+
+    public String deletePost(Long postId) {
+        Post post = postService.findById(postId);
+        postService.delete(post);
+
+        return post.getId() + "번 게시글 삭제에 성공하였습니다.";
+    }
 }

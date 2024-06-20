@@ -23,4 +23,9 @@ public class AdminController {
     public ResponseEntity editPost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.editPost(postId, requestDto));
     }
+
+    @DeleteMapping("/post/{postId}")
+    public ResponseEntity deletePost(@PathVariable Long postId) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.deletePost(postId));
+    }
 }
