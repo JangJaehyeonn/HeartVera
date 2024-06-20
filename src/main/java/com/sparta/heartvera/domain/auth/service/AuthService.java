@@ -1,12 +1,11 @@
 package com.sparta.heartvera.domain.auth.service;
 
-import com.sparta.heartvera.domain.auth.dto.LoginRequestDto;
+import com.sparta.heartvera.common.exception.CustomException;
 import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
 import com.sparta.heartvera.domain.user.entity.User;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.security.util.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static com.sparta.heartvera.common.exception.ErrorCode.USER_NOT_UNIQUE;
 
 @Slf4j
 @Service
@@ -40,8 +41,7 @@ public class AuthService {
         // 회원 아이디 중복 확인
         Optional<User> existingUser = userRepository.findByUserId(userId);
         if (existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("중복된 아이디가 존재합니다.");
+            throw new CustomException(USER_NOT_UNIQUE);
         }
 
         // 사용자 ROLE 기본 USER로 설정
@@ -73,5 +73,4 @@ public class AuthService {
                     .body("일반 사용자로 회원가입이 성공적으로 완료되었습니다.");
         }
     }
-
 }
