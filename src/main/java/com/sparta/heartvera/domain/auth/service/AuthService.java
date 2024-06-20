@@ -74,19 +74,4 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<String> login(LoginRequestDto loginRequestDto, HttpServletResponse res) {
-
-        Optional<User> existingUser = userRepository.findByUserId(loginRequestDto.getUserId());
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            String token = jwtUtil.createAccessToken(user.getUserName(),user.getAuthority());
-            jwtUtil.addAccessJwtToHeader(token, res);
-            
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body("로그인 성공");
-        }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("아이디가 틀립니다.");
-        }
-    }
 }

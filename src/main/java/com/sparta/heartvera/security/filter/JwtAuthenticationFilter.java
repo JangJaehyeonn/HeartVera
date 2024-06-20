@@ -37,7 +37,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             LoginRequestDto UserServiceReqDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class); // httpServletRequest의 request를 LoginRequestDto로 변환
 
-
             return getAuthenticationManager().authenticate( // 인증객체 만들기.
                     new UsernamePasswordAuthenticationToken(
                             UserServiceReqDto.getUserId(),
@@ -58,7 +57,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getAuthority();
         String accessToken = jwtUtil.createToken(username, role);
-        jwtUtil.addJwtToCookie(accessToken, response);
+        response.addHeader( JwtUtil.AUTHORIZATION_HEADER, accessToken);
     }
 
     @Override

@@ -25,11 +25,5 @@ public class AuthController {
     public ResponseEntity<String> signup(@RequestBody @Valid SignupRequestDto requestDto){
         return authService.signup(requestDto);
     }
-    
-    //로그인만들기 - 성공시 엑세스토큰 발급까지
-    @PostMapping(value = "/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto , HttpServletResponse res){
-        return authService.login(loginRequestDto, res);
-    }
 
 }
