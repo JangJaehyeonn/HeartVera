@@ -1,5 +1,7 @@
 package com.sparta.heartvera.domain.post.service;
 
+import com.sparta.heartvera.common.exception.CustomException;
+import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.post.dto.PostRequestDto;
 import com.sparta.heartvera.domain.post.dto.PostResponseDto;
 import com.sparta.heartvera.domain.post.entity.Post;
@@ -43,7 +45,7 @@ public class PostService {
     public String deletePost(Long postId, User user) {
         Post post = findById(postId);
         checkUserSame(post, user);
-        delete(post);
+        postRepository.delete(post);
 
         return postId + "번 게시물 삭제 완료";
     }
@@ -54,7 +56,7 @@ public class PostService {
         Page<Post> postList = postRepository.findAll(pageable);
 
         if (postList.getTotalElements() == 0) {
-            return "아직 등록된 게시물이 없습니다.";
+            throw new CustomException(ErrorCode.POST_EMPTY);
         }
 
         return postList.map(PostResponseDto::new);
@@ -62,13 +64,13 @@ public class PostService {
 
     public Post findById(Long postId) {
         return postRepository.findById(postId).orElseThrow(
-                () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다.")
+                () -> new CustomException(ErrorCode.POST_NOT_FOUND)
         );
     }
 
     private void checkUserSame(Post post, User user) {
         if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
-            throw new IllegalArgumentException("작성자만 접근할 수 있습니다.");
+            throw new CustomException(ErrorCode.POST_NOT_USER);
         }
     }
 
