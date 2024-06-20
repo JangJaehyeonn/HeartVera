@@ -14,6 +14,9 @@ public enum ErrorCode {
     DUPLICATE_PASSWORD(400, "기존 비밀번호와 동일한 비밀번호입니다."),
     USER_NOT_UNIQUE(400,"중복된 사용자가 존재합니다."),
     EMAIL_NOT_UNIQUE(400,"중복된 이메일이 존재합니다."),
+    CURRENT_PASSWORD_MATCH(400, "현재 비밀번호와 사용자의 비밀번호가 일치하지 않습니다."),
+    SAME_NEW_PASSWORD(400, "동일한 비밀번호로는 변경할 수 없습니다."),
+    RECENT_PASSWORD_MATCH(400, "최근 사용했던 비밀번호는 변경할 수 없습니다."),
     INCORRECT_PASSWORD(400, "입력하신 비밀번호가 일치하지 않습니다."),
     POST_NOT_FOUND(404,"게시글을 찾을 수 없습니다."),
     POST_NOT_USER(400, "해당 게시글의 작성자가 아닙니다."),
@@ -24,6 +27,8 @@ public enum ErrorCode {
     COMMENT_SAME_USER(400, "해당 댓글의 작성자입니다."),
     TOKEN_EXPIRED(400, "토큰이 만료되었습니다."),
     TOKEN_NOT_FOUND(400, "토큰을 찾을 수 없습니다.");
+
+
     private int status;
     private String msg;
 }

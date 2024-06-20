@@ -1,5 +1,6 @@
 package com.sparta.heartvera.security.util;
 
+import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -26,7 +27,8 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    private final long TOKEN_TIME = 60 * 60 * 1000L; // 60분
+    private final long ACCESSTOKEN_TIME = 30 * 60 * 1000L; // 30분
+    private final long REFRESHTOKEN_TIME = 12 * 60 * 60 * 1000L; // 12시간
 
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
     private String secretKey;
@@ -43,17 +45,32 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String username, UserRoleEnum role) {
+    public TokenResponseDto createToken(String userId, UserRoleEnum role) {
         Date date = new Date();
 
-        return BEARER_PREFIX +
+        String accessToken = BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(username) // 사용자 식별자값(ID)
+                        .setSubject(userId) // 사용자 식별자값(ID)
                         .claim(AUTHORIZATION_KEY, role) // 사용자 권한
-                        .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
+                        .setExpiration(new Date(date.getTime() + ACCESSTOKEN_TIME)) // 만료 시간
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
                         .compact();
+
+        String refreshToken = BEARER_PREFIX +
+                Jwts.builder()
+                        .setSubject(userId) // 사용자 식별자값(ID)
+                        .claim(AUTHORIZATION_KEY, role) // 사용자 권한
+                        .setExpiration(new Date(date.getTime() + REFRESHTOKEN_TIME)) // 만료 시간
+                        .setIssuedAt(date) // 발급일
+                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘
+                        .compact();
+
+        return TokenResponseDto.builder()
+                .grantType(role)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .key(userId).build();
     }
 
     // JWT Cookie 에 저장
@@ -66,6 +83,17 @@ public class JwtUtil {
         }
         return token;
     }
+    public void addAccessJwtToHeader(String token, HttpServletResponse res) {
+        try {
+            token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
+
+            res.setHeader(AUTHORIZATION_HEADER, token);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
 
     // JWT 토큰 substring
     public String substringToken(String tokenValue) {
