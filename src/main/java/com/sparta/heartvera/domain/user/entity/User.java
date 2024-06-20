@@ -1,15 +1,17 @@
 package com.sparta.heartvera.domain.user.entity;
 
 import com.sparta.heartvera.common.Timestamped;
-import com.sparta.heartvera.domain.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
+import lombok.*;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
 @Table(name = "users")
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // Builder 사용시 필요한 AllArgsConstructor
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,10 @@ public class User extends Timestamped {
 
     @Column(name = "refresh_token")
     private String refreshToken;
+
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private UserRoleEnum authority;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
