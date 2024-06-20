@@ -1,10 +1,8 @@
 package com.sparta.heartvera.domain.auth.controller;
 
-import com.sparta.heartvera.domain.auth.dto.LoginRequestDto;
 import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
 import com.sparta.heartvera.domain.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
