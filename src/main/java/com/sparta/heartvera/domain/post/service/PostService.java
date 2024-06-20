@@ -43,7 +43,7 @@ public class PostService {
     public String deletePost(Long postId, User user) {
         Post post = findById(postId);
         checkUserSame(post, user);
-        postRepository.delete(post);
+        delete(post);
 
         return postId + "번 게시물 삭제 완료";
     }
@@ -70,5 +70,21 @@ public class PostService {
         if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
             throw new IllegalArgumentException("작성자만 접근할 수 있습니다.");
         }
+    }
+
+    public Object getAllPostForAdmin(int page) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        Page<Post> postList = postRepository.findAll(pageable);
+
+        if (postList.getTotalElements() == 0) {
+            return "아직 등록된 게시물이 없습니다.";
+        }
+
+        return postList;
+    }
+
+    public void delete(Post post) {
+        postRepository.delete(post);
     }
 }
