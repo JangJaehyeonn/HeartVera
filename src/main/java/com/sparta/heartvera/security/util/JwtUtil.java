@@ -1,5 +1,7 @@
 package com.sparta.heartvera.security.util;
 
+import com.sparta.heartvera.common.exception.CustomException;
+import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
@@ -110,7 +112,7 @@ public class JwtUtil {
             return tokenValue.substring(7);
         }
         logger.error("Not Found Token");
-        throw new NullPointerException("Not Found Token");
+        throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     // 토큰 검증
