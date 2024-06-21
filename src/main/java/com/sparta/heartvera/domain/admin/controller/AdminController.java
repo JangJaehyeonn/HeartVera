@@ -43,4 +43,9 @@ public class AdminController {
     public ResponseEntity deletePublicPost(@PathVariable Long postId) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.deletePublicPost(postId));
     }
+
+    @GetMapping("/user")
+    public ResponseEntity findAllUser() {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllUser());
+    }
 }

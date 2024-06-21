@@ -79,4 +79,8 @@ public class UserService {
     );
   }
 
+  public List<User> findAllUser() {
+    return userRepository.findAll();
+  };
+
 }

@@ -5,8 +5,12 @@ import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.entity.PublicPost;
 import com.sparta.heartvera.domain.post.service.PostService;
 import com.sparta.heartvera.domain.post.service.PublicPostService;
+import com.sparta.heartvera.domain.user.entity.User;
+import com.sparta.heartvera.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -14,6 +18,7 @@ public class AdminService {
 
     private final PostService postService;
     private final PublicPostService publicPostService;
+    private final UserService userService;
 
     public Object getAllPost(int page) {
         return postService.getAllPostForAdmin(page);
@@ -51,5 +56,9 @@ public class AdminService {
         publicPostService.delete(post);
 
         return post.getId() + "번 게시글 삭제에 성공하였습니다.";
+    }
+
+    public List<User> findAllUser() {
+        return userService.findAllUser();
     }
 }
