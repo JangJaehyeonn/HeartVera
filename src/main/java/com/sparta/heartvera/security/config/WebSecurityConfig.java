@@ -1,6 +1,7 @@
 package com.sparta.heartvera.security.config;
 
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
+import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.security.filter.JwtAuthenticationFilter;
 import com.sparta.heartvera.security.filter.JwtAuthorizationFilter;
 import com.sparta.heartvera.security.service.UserDetailsServiceImpl;
