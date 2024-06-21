@@ -48,4 +48,9 @@ public class AdminController {
     public ResponseEntity findAllUser() {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.findAllUser());
     }
+
+    @PatchMapping("/user/{userId}")
+    public ResponseEntity changeUserAuthority(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.changeUserAuthority(userId));
+    }
 }

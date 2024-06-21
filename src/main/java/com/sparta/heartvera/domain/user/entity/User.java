@@ -74,7 +74,9 @@ public class User extends Timestamped {
   }
 
 
-    public void setRefreshToken(String token) {
+  public void setRefreshToken(String token) {
         this.refreshToken = token;
     }
+
+  public void setUserRole(UserRoleEnum role) { this.authority = role; }
 }

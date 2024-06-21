@@ -6,9 +6,11 @@ import com.sparta.heartvera.domain.post.entity.PublicPost;
 import com.sparta.heartvera.domain.post.service.PostService;
 import com.sparta.heartvera.domain.post.service.PublicPostService;
 import com.sparta.heartvera.domain.user.entity.User;
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -60,5 +62,18 @@ public class AdminService {
 
     public List<User> findAllUser() {
         return userService.findAllUser();
+    }
+
+    @Transactional
+    public String changeUserAuthority(Long userId) {
+        User user = userService.findByUserSeq(userId);
+
+        if(user.getAuthority() == UserRoleEnum.USER) {
+            user.setUserRole(UserRoleEnum.ADMIN);
+        } else {
+            user.setUserRole(UserRoleEnum.USER);
+        }
+
+        return user.getUserName() + " 회원의 권한이 " + user.getAuthority() + "으로 변경되었습니다.";
     }
 }
