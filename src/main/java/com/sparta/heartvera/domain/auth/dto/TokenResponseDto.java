@@ -3,9 +3,9 @@ package com.sparta.heartvera.domain.auth.dto;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @Builder
 @AllArgsConstructor
 public class TokenResponseDto {

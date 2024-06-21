@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ExceptionResponse> defaultException(HttpServletRequest request, Exception e){
+    protected ResponseEntity<ExceptionResponse> defaultException(HttpServletRequest request, Exception e) {
         e.printStackTrace();
         ExceptionResponse exceptionResponse = ExceptionResponse.builder()
                 .msg(ErrorCode.FAIL.getMsg())
@@ -25,12 +25,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ExceptionResponse> handleInvalidPasswordException(HttpServletRequest request, CustomException e) {
+    public ResponseEntity<ExceptionResponse> handleCustomException(HttpServletRequest request, CustomException e) {
         ExceptionResponse exceptionResponse = ExceptionResponse.builder()
                 .msg(e.getErrorCode().getMsg())
                 .path(request.getRequestURI())
                 .build();
-        return new ResponseEntity<>(exceptionResponse, HttpStatusCode.valueOf(e.getErrorCode().getStatus()));
+        return new ResponseEntity<>(exceptionResponse, e.getErrorCode().getStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -39,20 +39,24 @@ public class GlobalExceptionHandler {
         StringBuilder builder = new StringBuilder();
         String msg = ErrorCode.FAIL.getMsg();
 
-        FieldError fieldError = bindingResult.getFieldErrors().get(0);
-        String fieldName = fieldError.getField();
+        if (bindingResult.hasFieldErrors()) {
+            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            String fieldName = fieldError.getField();
 
-        builder.append("[");
-        builder.append(fieldName);
-        builder.append("](은)는 ");
-        builder.append(fieldError.getDefaultMessage());
-        builder.append(" / 입력된 값: [");
-        builder.append(fieldError.getRejectedValue());
-        builder.append("]");
+            builder.append("[");
+            builder.append(fieldName);
+            builder.append("](은)는 ");
+            builder.append(fieldError.getDefaultMessage());
+            builder.append(" / 입력된 값: [");
+            builder.append(fieldError.getRejectedValue());
+            builder.append("]");
+
+            msg = builder.toString();
+        }
 
         return new ResponseEntity<>(
                 ExceptionResponse.builder()
-                        .msg(builder.toString())
+                        .msg(msg)
                         .path(request.getRequestURI())
                         .build(),
                 HttpStatus.BAD_REQUEST

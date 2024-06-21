@@ -7,6 +7,7 @@ import com.sparta.heartvera.domain.user.dto.UserRequestDto;
 import com.sparta.heartvera.domain.user.dto.UserResponseDto;
 import com.sparta.heartvera.domain.user.entity.PasswordHistory;
 import com.sparta.heartvera.domain.user.entity.User;
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.repository.PasswordHistoryRepository;
 import com.sparta.heartvera.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
+import static com.sparta.heartvera.common.exception.ErrorCode.USER_NOT_UNIQUE;
 
 @Service
 @RequiredArgsConstructor
@@ -74,10 +78,33 @@ public class UserService {
 
     }
 
+    public User createUser(String userId, String userName,
+                           String password, String email,
+                           String description, UserRoleEnum role) {
+        // 유저 Entity 생성
+        User user = User.builder()
+                .userId(userId)
+                .userName(userName)
+                .userPassword(password)
+                .userEmail(email)
+                .description(description)
+                .authority(role)
+                .build();
+
+        // 유저 DB 생성
+        userRepository.save(user);
+
+        return user;
+    }
+
     @Transactional
     public void logout(User user) {
         // 유저의 리프레쉬 토큰 초기화
         user.setRefreshToken(null);
+        userRepository.save(user);
+    }
+
+    public void updateUser(User user){
         userRepository.save(user);
     }
 
@@ -87,4 +114,17 @@ public class UserService {
         );
     }
 
+    public void findByUserName(String userName) {
+        Optional<User> existingUser = userRepository.findByUserName(userName);
+        if (existingUser.isPresent()) {
+            throw new CustomException(USER_NOT_UNIQUE);
+        }
+    }
+
+    public User findByRefreshToken(String refreshToken) {
+        User user = userRepository.findByRefreshToken(refreshToken).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        return user;
+    }
 }
