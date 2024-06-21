@@ -18,7 +18,7 @@ public class PublicPostController {
     private final PublicPostService postService;
 
     @PostMapping("/")
-    public ResponseEntity saveRecipe(@Valid @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity savePost(@Valid @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.savePost(requestDto, userDetails.getUser()));
     }
 
