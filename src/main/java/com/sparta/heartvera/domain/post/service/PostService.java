@@ -4,6 +4,7 @@ import com.sparta.heartvera.common.exception.CustomException;
 import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.post.dto.PostRequestDto;
 import com.sparta.heartvera.domain.post.dto.PostResponseDto;
+import com.sparta.heartvera.domain.post.dto.PublicPostResponseDto;
 import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.repository.PostRepository;
 import com.sparta.heartvera.domain.user.entity.User;
@@ -76,14 +77,14 @@ public class PostService {
 
     public Object getAllPostForAdmin(int page) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, 5, sort);
         Page<Post> postList = postRepository.findAll(pageable);
 
         if (postList.getTotalElements() == 0) {
-            return "아직 등록된 게시물이 없습니다.";
+            throw new CustomException(ErrorCode.POST_EMPTY);
         }
 
-        return postList;
+        return postList.map(PublicPostResponseDto::new);
     }
 
     public void delete(Post post) {

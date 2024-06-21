@@ -21,4 +21,12 @@ public class PublicPostResponseDto {
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
     }
+
+    public PublicPostResponseDto(Post post) {
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.userName = post.getUser().getUserName();
+        this.createdAt = post.getCreatedAt();
+        this.modifiedAt = post.getModifiedAt();
+    }
 }

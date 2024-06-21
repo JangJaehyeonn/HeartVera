@@ -16,7 +16,7 @@ public class AdminController {
 
     @GetMapping("/posts")
     public ResponseEntity getAllPost(@RequestParam int page) {
-        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPost(page));
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPost(page -1));
     }
 
     @PatchMapping("/posts/{postId}")
