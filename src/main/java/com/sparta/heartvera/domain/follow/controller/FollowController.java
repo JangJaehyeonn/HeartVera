@@ -52,5 +52,4 @@ public class FollowController {
     List<FollowResponseDto> followers = followService.getFollowings(user);
     return ResponseEntity.status(HttpStatus.OK).body(followers);
   }
-
 }

@@ -33,5 +33,4 @@ public class Follow extends Timestamped {
     this.fromUser = fromUser;
     this.toUser =toUser;
   }
-
 }

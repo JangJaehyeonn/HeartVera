@@ -10,5 +10,4 @@ public class FollowResponseDto {
   public FollowResponseDto(User user) {
     this.userName = user.getUserName();
   }
-
 }

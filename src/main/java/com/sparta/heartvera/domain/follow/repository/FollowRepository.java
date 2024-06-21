@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface FollowRepository extends JpaRepository<Follow, Long> {
 
   Optional<Follow> findByFromUserAndToUser(User fromUser, User toUser);
-
   List<Follow> findByFromUser(User currentUser);
 
 }

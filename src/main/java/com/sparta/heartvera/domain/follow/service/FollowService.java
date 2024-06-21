@@ -49,5 +49,4 @@ public class FollowService {
     }
     return followResponseDtoList;
   }
-
 }
