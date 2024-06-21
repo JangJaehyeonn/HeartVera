@@ -78,14 +78,14 @@ public class PublicPostService {
 
     public Object getAllPostForAdmin(int page) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, 5, sort);
         Page<PublicPost> postList = postRepository.findAll(pageable);
 
         if (postList.getTotalElements() == 0) {
-            return "아직 등록된 게시물이 없습니다.";
+            throw new CustomException(ErrorCode.POST_EMPTY);
         }
 
-        return postList;
+        return postList.map(PublicPostResponseDto::new);
     }
 
     public void delete(PublicPost post) {
