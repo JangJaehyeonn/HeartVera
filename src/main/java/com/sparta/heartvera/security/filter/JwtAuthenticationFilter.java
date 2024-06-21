@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // 설정된 메시지와 상태 코드 반환
         response.setStatus(HttpStatus.OK.value());
-        writeMessageResponse(response, "로그인을 성공하였습니다.");
+        ErrorResponseWriter.writeMessageResponse(response, "로그인을 성공하였습니다.");
     }
 
     @Override
@@ -85,8 +85,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 실패");
 
         // 설정된 메시지와 상태 코드 response body로 반환
-        response.setStatus(ErrorCode.USER_NOT_FOUND.getStatus());
-        writeMessageResponse(response, ErrorCode.USER_NOT_FOUND.getMsg());
+        ErrorResponseWriter.writeMessageResponse(response, ErrorCode.USER_NOT_FOUND);
     }
 
     @Override
@@ -101,13 +100,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
         super.doFilter(request, response, chain);
 
-    }
-
-    // response body에 반환하기 위한 함수
-    private void writeMessageResponse(HttpServletResponse response, String message) throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.getWriter().write(message);
     }
 
 }
