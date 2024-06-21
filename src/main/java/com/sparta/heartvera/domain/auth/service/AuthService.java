@@ -65,6 +65,7 @@ public class AuthService {
                 .authority(role)
                 .build();
 
+        // 유저 DB 생성
         userRepository.save(user);
 
         // 회원가입 성공 메시지 반환
@@ -78,31 +79,27 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponseDto reAuth(String refreshtoken) {
-        String subToken = jwtUtil.substringToken(refreshtoken);
-        User user = userRepository.findByRefreshToken(refreshtoken).orElseThrow(
+    public TokenResponseDto reAuth(String refreshToken) {
+        String subToken = jwtUtil.substringToken(refreshToken);
+        User user = userRepository.findByRefreshToken(refreshToken).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         ); // 리프레쉬 토큰 검증
         if(!jwtUtil.validateToken(subToken)) {
             throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         } // 올바른 토큰이 아닐 경우
-        if(jwtUtil.substringToken(refreshtoken).equals(user.getRefreshToken())) {
+        if(jwtUtil.substringToken(refreshToken).equals(user.getRefreshToken())) {
             throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
         }
 
+        // 리프레쉬 토큰에서 userId 꺼내오기
         String userId = jwtUtil.getUserInfoFromToken(subToken).getSubject();
+        // jwtUtil.createToken 에서 액세스 토큰, 리프레쉬 토큰 재생성
         TokenResponseDto token = jwtUtil.createToken(userId, user.getAuthority());
+        // 유저 DB refresh token 값 변경
         user.setRefreshToken(token.getRefreshToken());
         userRepository.save(user);
 
         return jwtUtil.createToken(userId, user.getAuthority());
     }
 
-    @Transactional
-    public ResponseEntity<String> logout(User user) {
-        user.setRefreshToken(null);
-        userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("로그아웃이 완료되었습니다.");
-    }
 }
