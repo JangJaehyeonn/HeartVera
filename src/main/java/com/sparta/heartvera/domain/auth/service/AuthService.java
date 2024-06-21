@@ -1,11 +1,14 @@
 package com.sparta.heartvera.domain.auth.service;
 
 import com.sparta.heartvera.common.exception.CustomException;
+import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
+import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.user.entity.User;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.security.util.JwtUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,5 +75,34 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.OK)
                     .body("일반 사용자로 회원가입이 성공적으로 완료되었습니다.");
         }
+    }
+
+    @Transactional
+    public TokenResponseDto reAuth(String refreshtoken) {
+        String subToken = jwtUtil.substringToken(refreshtoken);
+        User user = userRepository.findByRefreshToken(refreshtoken).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        ); // 리프레쉬 토큰 검증
+        if(!jwtUtil.validateToken(subToken)) {
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        } // 올바른 토큰이 아닐 경우
+        if(jwtUtil.substringToken(refreshtoken).equals(user.getRefreshToken())) {
+            throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
+        }
+
+        String userId = jwtUtil.getUserInfoFromToken(subToken).getSubject();
+        TokenResponseDto token = jwtUtil.createToken(userId, user.getAuthority());
+        user.setRefreshToken(token.getRefreshToken());
+        userRepository.save(user);
+
+        return jwtUtil.createToken(userId, user.getAuthority());
+    }
+
+    @Transactional
+    public ResponseEntity<String> logout(User user) {
+        user.setRefreshToken(null);
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("로그아웃이 완료되었습니다.");
     }
 }

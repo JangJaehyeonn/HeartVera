@@ -1,9 +1,10 @@
 package com.sparta.heartvera.security.filter;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.heartvera.domain.auth.dto.LoginRequestDto;
+import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
+import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.security.service.UserDetailsImpl;
 import com.sparta.heartvera.security.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -23,10 +24,11 @@ import java.io.IOException;
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
 
-
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
 
         setFilterProcessesUrl("/api/auth/login");
     }
@@ -54,15 +56,27 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
+
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getAuthority();
-        String accessToken = jwtUtil.createToken(username, role);
-        response.addHeader( JwtUtil.AUTHORIZATION_HEADER, accessToken);
+        TokenResponseDto tokenResponse = jwtUtil.createToken(username, role);
+
+        // 액세스 토큰 헤더에 추가
+        response.addHeader( JwtUtil.AUTHORIZATION_HEADER, tokenResponse.getAccessToken());
+
+        // 리프래쉬 토큰 유저 DB에 추가
+        userRepository.findByUserId(username).ifPresent(
+                user -> {
+                    user.setRefreshToken(tokenResponse.getRefreshToken());
+                    userRepository.save(user);
+                }
+        );
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패");
+        // 글로벌 예외처리 가능?
         response.setStatus(401);
     }
 
