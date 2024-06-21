@@ -30,6 +30,6 @@ public class SwaggerConfig {
         return new Info()
                 .title("HeartVera API")
                 .version("1.0")
-                .description("HeartVera API");
+                .description("Heartvera 프로젝트의 API 문서화");
     }
 }
