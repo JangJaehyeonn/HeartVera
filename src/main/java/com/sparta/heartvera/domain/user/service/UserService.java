@@ -73,7 +73,7 @@ public class UserService {
 
   }
 
-  private User findByUserSeq(Long userSeq) {
+  public User findByUserSeq(Long userSeq) {
     return userRepository.findById(userSeq).orElseThrow(() ->
         new CustomException(ErrorCode.USER_NOT_FOUND)
     );
