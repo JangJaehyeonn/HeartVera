@@ -34,8 +34,30 @@ public class LikeController {
         return likeService.togglePostLike(userDetails.getUser().getUserSeq(), postId);
     }
 
-//    @PostMapping("/{postId}/comments/{commentId}/like")
-//    public ResponseEntity<String> toggleCommentLike(@PathVariable(name = "commentId") long commentId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return likeService.toggleCommentLike(userDetails.getUser().getUserSeq(), commentId);
-//    }
+    // 댓글별 좋아요 토글
+    @PostMapping("/{postId}/comments/{commentId}/like")
+    public ResponseEntity<String> toggleCommentLike(@PathVariable(name = "commentId") long commentId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return likeService.toggleCommentLike(userDetails.getUser().getUserSeq(), commentId);
+    }
+
+    // 게시물별 좋아요 삭제
+    @DeleteMapping("/{postId}/like")
+    public ResponseEntity<String> deletePostLike(@PathVariable(name = "postId") long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            return likeService.deletePostLike(userDetails.getUser().getUserSeq(), postId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 댓글별 좋아요 삭제
+    @DeleteMapping("/{postId}/comments/{commentId}/like")
+    public ResponseEntity<String> deleteCommentLike(@PathVariable(name = "commentId") long commentId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            return likeService.deleteCommentLike(userDetails.getUser().getUserSeq(), commentId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

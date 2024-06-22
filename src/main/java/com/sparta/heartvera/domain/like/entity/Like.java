@@ -19,11 +19,14 @@ public class Like extends Timestamped {
     @Column(name = "like_id")
     private Long likeId;
 
-    @Column(name = "user_id")
+
+    @Column(name = "user_id", nullable = false)
     private Long userId;
+
 
     @Column(name = "content_id", nullable = false)
     private Long contentId;
+
 
     @Column(name = "content_type", nullable = false)
     @Enumerated(value = EnumType.STRING)
