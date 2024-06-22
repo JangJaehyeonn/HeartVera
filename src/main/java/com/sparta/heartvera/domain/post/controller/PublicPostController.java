@@ -4,24 +4,19 @@ import com.sparta.heartvera.domain.post.dto.PostRequestDto;
 import com.sparta.heartvera.domain.post.dto.PublicPostResponseDto;
 import com.sparta.heartvera.domain.post.service.PublicPostService;
 import com.sparta.heartvera.security.service.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "공개 게시판 API",description = "공개 게시판 관련된 기능을 담당하는 API 입니다.")
 @RequestMapping("/api/pubposts")
 public class PublicPostController {
 
@@ -53,14 +48,15 @@ public class PublicPostController {
         .body(postService.deletePost(postId, userDetails.getUser()));
   }
 
-  @GetMapping("/")
-  public ResponseEntity getAllPost(@RequestParam("page") int page) {
-    return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPost(page - 1));
-  }
+    @Operation(summary = "공개글 전체 조회",description = "공개 게시글을 전체조회합니다.(한페이지당 5개씩 조회)")
+    @GetMapping("/")
+    public ResponseEntity getAllPost(@RequestParam("page") int page) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPost(page - 1));
+    }
 
   @GetMapping("/followed")
   public ResponseEntity<List<PublicPostResponseDto>> getFollowedPosts(
-      @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam("page") int page, int pageSize) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam("page") int page, @RequestParam("size") int pageSize) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(postService.getFollowedPosts(userDetails.getUser(), page, pageSize));
   }
