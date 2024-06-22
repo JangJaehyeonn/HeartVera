@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
     FAIL(500, "실패했습니다."),
-    USER_NOT_FOUND(400, "해당하는 유저를 찾을 수 없습니다."),
+    USER_NOT_FOUND(401, "해당하는 유저를 찾을 수 없습니다."),
     SOCIAL_TOKEN_GET_FAILED(500, "해당하는 소셜 유저 토큰을 가져오는데 실패했습니다."),
     SOCIAL_USER_NOT_FOUND(400, "해당하는 소셜 유저 데이터를 가져오는데 실패했습니다."),
     DUPLICATE_PASSWORD(400, "기존 비밀번호와 동일한 비밀번호입니다."),
@@ -29,7 +29,8 @@ public enum ErrorCode {
     COMMENT_NOT_USER(400, "해당 댓글의 작성자가 아닙니다."),
     COMMENT_SAME_USER(400, "해당 댓글의 작성자입니다."),
     TOKEN_EXPIRED(400, "토큰이 만료되었습니다."),
-    TOKEN_NOT_FOUND(400, "토큰을 찾을 수 없습니다.");
+    TOKEN_NOT_FOUND(400, "토큰을 찾을 수 없습니다."),
+    INVALID_TOKEN(400,"유효하지 않은 토큰입니다." );
 
 
     private int status;
