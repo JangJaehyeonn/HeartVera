@@ -38,8 +38,12 @@ public enum ErrorCode {
     // 댓글 도메인 오류 코드
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
     COMMENT_NOT_USER(HttpStatus.FORBIDDEN, "해당 댓글의 작성자가 아닙니다."),
-    COMMENT_SAME_USER(HttpStatus.FORBIDDEN, "해당 댓글의 작성자입니다.");
+    COMMENT_SAME_USER(HttpStatus.FORBIDDEN, "해당 댓글의 작성자입니다."),
 
+    // 팔로우 도메인 오류 코드
+    SAME_USER(HttpStatus.BAD_REQUEST, "자신을 팔로우 할 수 없습니다."),
+    ALREADY_FOLLOW(HttpStatus.BAD_REQUEST, "이미 팔로우를 하셨습니다."),
+    RECENT_NOT_FOLLOW(HttpStatus.BAD_REQUEST, "이 유저를 팔로우하지 않았습니다.");
 
     private final HttpStatus status;
     private String msg;

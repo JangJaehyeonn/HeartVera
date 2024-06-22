@@ -1,11 +1,13 @@
 package com.sparta.heartvera.domain.post.controller;
 
 import com.sparta.heartvera.domain.post.dto.PostRequestDto;
+import com.sparta.heartvera.domain.post.dto.PublicPostResponseDto;
 import com.sparta.heartvera.domain.post.service.PublicPostService;
 import com.sparta.heartvera.security.service.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/pubposts")
 public class PublicPostController {
 
-    private final PublicPostService postService;
+  private final PublicPostService postService;
 
     @Operation(summary = "공개글 작성",description = "공개 게시글을 작성합니다.")
     @PostMapping("/")
@@ -49,4 +51,12 @@ public class PublicPostController {
     public ResponseEntity getAllPost(@RequestParam("page") int page) {
         return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPost(page - 1));
     }
+
+    @GetMapping("/followed")
+    public ResponseEntity<List<PublicPostResponseDto>> getFollowedPosts(
+      @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam("page") int page, @RequestParam("size") int pageSize) {
+     return ResponseEntity.status(HttpStatus.OK)
+        .body(postService.getFollowedPosts(userDetails.getUser(), page, pageSize));
+     }
+
 }
