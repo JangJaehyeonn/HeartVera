@@ -72,4 +72,12 @@ public class CommentService {
         new CustomException(ErrorCode.POST_NOT_FOUND));
   }
 
+  //좋아요 유효성 검사
+  public void validateCommentLike(Long userId, Long commentId) {
+    Comment comment = commentRepository.findById(commentId).orElseThrow(()->
+            new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+    if(comment.getUser().getUserSeq().equals(commentId)){
+      throw new CustomException(ErrorCode.COMMENT_SAME_USER);
+    }
+  }
 }
