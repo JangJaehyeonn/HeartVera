@@ -1,5 +1,6 @@
 package com.sparta.heartvera.security.filter;
 
+import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.security.service.UserDetailsServiceImpl;
 import com.sparta.heartvera.security.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j(topic = "JWT 검증 및 인가")
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -38,7 +40,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String tokenValue = jwtUtil.substringToken(reqToken);
             log.info(tokenValue);
 
+            // 유효한지 체크
             if (!jwtUtil.validateToken(tokenValue)) {
+                ErrorResponseWriter.writeMessageResponse(res, ErrorCode.INVALID_TOKEN);
                 log.error("Token Error");
                 return;
             }
@@ -47,7 +51,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             try {
                 setAuthentication(info.getSubject());
-            } catch (Exception e) {
+            } catch (Exception e) { // 인증 실패
+                ErrorResponseWriter.writeMessageResponse(res, ErrorCode.TOKEN_EXPIRED);
                 log.error(e.getMessage());
                 return;
             }
@@ -70,4 +75,5 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
+
 }
