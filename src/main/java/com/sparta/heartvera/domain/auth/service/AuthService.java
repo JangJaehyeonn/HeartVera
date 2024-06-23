@@ -1,11 +1,14 @@
 package com.sparta.heartvera.domain.auth.service;
 
 import com.sparta.heartvera.common.exception.CustomException;
+import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
+import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.user.entity.User;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.security.util.JwtUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +65,7 @@ public class AuthService {
                 .authority(role)
                 .build();
 
+        // 유저 DB 생성
         userRepository.save(user);
 
         // 회원가입 성공 메시지 반환
@@ -73,4 +77,29 @@ public class AuthService {
                     .body("일반 사용자로 회원가입이 성공적으로 완료되었습니다.");
         }
     }
+
+    @Transactional
+    public TokenResponseDto reAuth(String refreshToken) {
+        String subToken = jwtUtil.substringToken(refreshToken);
+        User user = userRepository.findByRefreshToken(refreshToken).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        ); // 리프레쉬 토큰 검증
+        if(!jwtUtil.validateToken(subToken)) {
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        } // 올바른 토큰이 아닐 경우
+        if(jwtUtil.substringToken(refreshToken).equals(user.getRefreshToken())) {
+            throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
+        }
+
+        // 리프레쉬 토큰에서 userId 꺼내오기
+        String userId = jwtUtil.getUserInfoFromToken(subToken).getSubject();
+        // jwtUtil.createToken 에서 액세스 토큰, 리프레쉬 토큰 재생성
+        TokenResponseDto token = jwtUtil.createToken(userId, user.getAuthority());
+        // 유저 DB refresh token 값 변경
+        user.setRefreshToken(token.getRefreshToken());
+        userRepository.save(user);
+
+        return jwtUtil.createToken(userId, user.getAuthority());
+    }
+
 }

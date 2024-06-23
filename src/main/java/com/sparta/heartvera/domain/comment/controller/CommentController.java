@@ -4,6 +4,8 @@ import com.sparta.heartvera.domain.comment.dto.CommentRequestDto;
 import com.sparta.heartvera.domain.comment.dto.CommentResponseDto;
 import com.sparta.heartvera.domain.comment.service.CommentService;
 import com.sparta.heartvera.security.service.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "댓글 API",description = "댓글과 관련된 기능을 담당하는 API 입니다.")
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class CommentController {
@@ -27,6 +30,7 @@ public class CommentController {
   private final CommentService commentService;
 
   // 댓글 작성
+  @Operation(summary = "댓글 작성",description = "댓글을 작성합니다.")
   @PostMapping("/{postId}/comments")
   public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long postId,
       @RequestBody @Valid CommentRequestDto requestDto,
@@ -36,12 +40,14 @@ public class CommentController {
   }
 
   // 선택한 게시물의 댓글 조회
+  @Operation(summary = "선택 게시물 댓글 조회",description = "선택한 게시물의 댓글을 조회합니다.")
   @GetMapping("/{postId}/comments")
   public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long postId) {
     return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(postId));
   }
 
   // 댓글 수정
+  @Operation(summary = "댓글 수정",description = "댓글의 내용을 수정합니다.")
   @PutMapping("/{postId}/comments/{commentId}")
   public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long postId,
       @PathVariable Long commentId,
@@ -52,6 +58,7 @@ public class CommentController {
   }
 
   // 댓글 삭제
+  @Operation(summary = "댓글 삭제",description = "댓글을 삭제합니다.")
   @DeleteMapping("/{postId}/comments/{commentId}")
   public ResponseEntity<String> deleteComment(@PathVariable Long postId,
       @PathVariable Long commentId,

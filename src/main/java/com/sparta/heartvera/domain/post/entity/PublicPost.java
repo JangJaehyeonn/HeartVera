@@ -1,19 +1,17 @@
 package com.sparta.heartvera.domain.post.entity;
 
 import com.sparta.heartvera.common.Timestamped;
-import com.sparta.heartvera.domain.comment.entity.Comment;
 import com.sparta.heartvera.domain.post.dto.PostRequestDto;
 import com.sparta.heartvera.domain.user.entity.User;
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "post")
+@Table(name = "public_post")
 @NoArgsConstructor
-public class Post extends Timestamped {
+public class PublicPost extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,10 +26,7 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String content;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
-
-    public Post(PostRequestDto requestDto, User user) {
+    public PublicPost(PostRequestDto requestDto, User user) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
         this.user = user;
