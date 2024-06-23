@@ -53,4 +53,9 @@ public class AdminController {
     public ResponseEntity changeUserAuthority(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.changeUserAuthority(userId));
     }
+
+    @GetMapping("/comments")
+    public ResponseEntity getAllComment() {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllComment());
+    }
 }

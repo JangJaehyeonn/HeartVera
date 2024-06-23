@@ -1,5 +1,8 @@
 package com.sparta.heartvera.domain.admin.service;
 
+import com.sparta.heartvera.domain.comment.dto.PublicCommentResponseDto;
+import com.sparta.heartvera.domain.comment.entity.Comment;
+import com.sparta.heartvera.domain.comment.service.CommentService;
 import com.sparta.heartvera.domain.post.dto.PostRequestDto;
 import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.entity.PublicPost;
@@ -21,6 +24,7 @@ public class AdminService {
     private final PostService postService;
     private final PublicPostService publicPostService;
     private final UserService userService;
+    private final CommentService commentService;
 
     public Object getAllPost(int page) {
         return postService.getAllPostForAdmin(page);
@@ -75,5 +79,9 @@ public class AdminService {
         }
 
         return user.getUserName() + " 회원의 권한이 " + user.getAuthority() + "으로 변경되었습니다.";
+    }
+
+    public List<PublicCommentResponseDto> getAllComment() {
+        return commentService.getAllCommentForAdmin();
     }
 }
