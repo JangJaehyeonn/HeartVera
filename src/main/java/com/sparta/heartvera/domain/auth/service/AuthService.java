@@ -1,23 +1,36 @@
 package com.sparta.heartvera.domain.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.heartvera.common.exception.CustomException;
 import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
+import com.sparta.heartvera.domain.auth.dto.SocialUserDto;
 import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.user.entity.User;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.repository.UserRepository;
+import com.sparta.heartvera.security.service.UserDetailsImpl;
 import com.sparta.heartvera.security.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.sparta.heartvera.common.exception.ErrorCode.USER_NOT_UNIQUE;
 

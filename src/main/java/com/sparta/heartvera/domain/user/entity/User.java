@@ -10,7 +10,7 @@ import lombok.*;
 @Entity
 @Getter
 @Table(name = "users")
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // Builder 사용시 필요한 AllArgsConstructor
 public class User extends Timestamped {
     @Id
@@ -30,7 +30,7 @@ public class User extends Timestamped {
     private String userName;
 
     @Email
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String userEmail;
 
     @Column(name = "description")
@@ -42,8 +42,21 @@ public class User extends Timestamped {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum authority;
+    @Column(name = "sign_up_type")
+    private int signUpType; // 추가된 필드
+
+    public User(String userId, String userPassword, String userName, int signUpType, UserRoleEnum authority) {
+        this.userId = userId;
+        this.userPassword = userPassword;
+        this.userName = userName;
+        this.signUpType = signUpType; // 초기화
+        this.authority = authority;
+    }
 
     public void setRefreshToken(String token) {
         this.refreshToken = token;
+    }
+
+    public void update(int signUpType) {
     }
 }
