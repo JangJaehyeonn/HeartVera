@@ -56,7 +56,7 @@ public class PublicPostController {
     public ResponseEntity<List<PublicPostResponseDto>> getFollowedPosts(
       @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam("page") int page, @RequestParam(value = "size", defaultValue = "5") int pageSize) {
      return ResponseEntity.status(HttpStatus.OK)
-        .body(postService.getFollowedPosts(userDetails.getUser(), page, pageSize));
+        .body(postService.getFollowedPosts(userDetails.getUser(), page - 1, pageSize));
      }
 
 }

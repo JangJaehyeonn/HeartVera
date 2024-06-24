@@ -79,7 +79,7 @@ public class PublicPostService {
     for (Follow followerList : follows) {
       User followedUser = followerList.getToUser();
       Page<PublicPost> publicPosts = postRepository.findByUserOrderByCreatedAtDesc(followedUser, pageable);
-      if (publicPosts.getTotalElements() == 0) {
+      if (publicPosts.isEmpty()) {
         throw new CustomException(ErrorCode.POST_EMPTY);
       }
       for(PublicPost publicPost : publicPosts) {
@@ -92,29 +92,38 @@ public class PublicPostService {
 
   public PublicPost findById(Long postId) {
     return postRepository.findById(postId).orElseThrow(
-        () -> new CustomException(ErrorCode.POST_NOT_FOUND)
+            () -> new CustomException(ErrorCode.POST_NOT_FOUND)
     );
   }
 
-    private void checkUserSame(PublicPost post, User user) {
-        if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
-            throw new CustomException(ErrorCode.POST_NOT_USER);
-        }
+  private void checkUserSame(PublicPost post, User user) {
+    if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
+      throw new CustomException(ErrorCode.POST_NOT_USER);
     }
+  }
 
-    public Object getAllPostForAdmin(int page, int amount) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, amount, sort);
-        Page<PublicPost> postList = postRepository.findAll(pageable);
+  public Object getAllPostForAdmin(int page, int amount) {
+    Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+    Pageable pageable = PageRequest.of(page, amount, sort);
+    Page<PublicPost> postList = postRepository.findAll(pageable);
 
         if (postList.getTotalElements() == 0) {
             return "먼저 작성하여 소식을 알려보세요!";
         }
 
-        return postList.map(PublicPostResponseDto::new);
-    }
+    return postList.map(PublicPostResponseDto::new);
+  }
 
-    public void delete(PublicPost post) {
-        postRepository.delete(post);
+  public void delete(PublicPost post) {
+    postRepository.delete(post);
+  }
+
+  //좋아요 유효성 검사
+  public void validatePostLike(Long userId, Long postId) {
+    PublicPost post = postRepository.findById(postId).orElseThrow(()->
+            new CustomException(ErrorCode.POST_NOT_FOUND));
+    if(post.getUser().getUserSeq().equals(userId)){
+      throw new CustomException(ErrorCode.POST_SAME_USER);
     }
+  }
 }

@@ -7,15 +7,10 @@ import com.sparta.heartvera.domain.comment.dto.CommentResponseDto;
 import com.sparta.heartvera.domain.comment.dto.PublicCommentResponseDto;
 import com.sparta.heartvera.domain.comment.entity.Comment;
 import com.sparta.heartvera.domain.comment.repository.CommentRepository;
-import com.sparta.heartvera.domain.post.dto.PublicPostResponseDto;
 import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.service.PostService;
 import com.sparta.heartvera.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,5 +75,14 @@ public class CommentService {
 
     public List<PublicCommentResponseDto> getAllCommentForAdmin() {
         return commentRepository.findAll().stream().map(PublicCommentResponseDto::new).toList();
+    }
+
+    //좋아요 유효성 검사
+    public void validateCommentLike(Long userId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()->
+                new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+        if(comment.getUser().getUserSeq().equals(userId)){
+            throw new CustomException(ErrorCode.COMMENT_SAME_USER);
+        }
     }
 }
