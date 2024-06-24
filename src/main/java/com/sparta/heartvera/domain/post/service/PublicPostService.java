@@ -27,6 +27,7 @@ public class PublicPostService {
   private final PublicPostRepository postRepository;
   private final UserService userService;
   private final FollowRepository followRepository;
+  private final PublicPostRepository publicPostRepository;
 
   public PublicPostResponseDto savePost(PostRequestDto requestDto, User user) {
     PublicPost post = postRepository.save(new PublicPost(requestDto, user));
@@ -101,4 +102,14 @@ public class PublicPostService {
       throw new CustomException(ErrorCode.POST_NOT_USER);
     }
   }
+
+  //좋아요 유효성 검사
+  public void validatePostLike(Long userId, Long postId) {
+    PublicPost post = publicPostRepository.findById(postId).orElseThrow(()->
+            new CustomException(ErrorCode.POST_NOT_FOUND));
+    if(post.getUser().getUserSeq().equals(userId)){
+      throw new CustomException(ErrorCode.POST_SAME_USER);
+    }
+  }
+
 }

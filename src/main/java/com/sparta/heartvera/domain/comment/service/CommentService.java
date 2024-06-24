@@ -76,8 +76,9 @@ public class CommentService {
   public void validateCommentLike(Long userId, Long commentId) {
     Comment comment = commentRepository.findById(commentId).orElseThrow(()->
             new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-    if(comment.getUser().getUserSeq().equals(commentId)){
+    if(comment.getUser().getUserSeq().equals(userId)){
       throw new CustomException(ErrorCode.COMMENT_SAME_USER);
     }
   }
+
 }
