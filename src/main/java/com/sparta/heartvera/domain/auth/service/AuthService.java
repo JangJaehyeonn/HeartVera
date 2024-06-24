@@ -7,21 +7,14 @@ import com.sparta.heartvera.domain.auth.dto.SignupResponseDto;
 import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.user.entity.User;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
-import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.domain.user.service.UserService;
 import com.sparta.heartvera.security.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
-import static com.sparta.heartvera.common.exception.ErrorCode.USER_NOT_UNIQUE;
 
 @Slf4j
 @Service
@@ -44,7 +37,7 @@ public class AuthService {
         String adminPassword = request.getAdminPassword();
 
         // 회원 아이디 중복 확인
-        userService.findByUserName(userId);
+        userService.findByUserId(userId);
 
         // 사용자 ROLE 기본 USER로 설정
         UserRoleEnum authority = determineUserRole(adminPassword);

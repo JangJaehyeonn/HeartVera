@@ -119,8 +119,8 @@ public class UserService {
   public List<User> findAllUser() {
     return userRepository.findAll();
   };
-    public void findByUserName(String userName) {
-        Optional<User> existingUser = userRepository.findByUserName(userName);
+    public void findByUserId(String userName) {
+        Optional<User> existingUser = userRepository.findByUserId(userName);
         if (existingUser.isPresent()) {
             throw new CustomException(USER_NOT_UNIQUE);
         }
