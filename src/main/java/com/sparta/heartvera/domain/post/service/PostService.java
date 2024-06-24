@@ -4,6 +4,7 @@ import com.sparta.heartvera.common.exception.CustomException;
 import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.post.dto.PostRequestDto;
 import com.sparta.heartvera.domain.post.dto.PostResponseDto;
+import com.sparta.heartvera.domain.post.dto.PublicPostResponseDto;
 import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.repository.PostRepository;
 import com.sparta.heartvera.domain.user.entity.User;
@@ -72,5 +73,21 @@ public class PostService {
         if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
             throw new CustomException(ErrorCode.POST_NOT_USER);
         }
+    }
+
+    public Object getAllPostForAdmin(int page, int amount) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page, amount, sort);
+        Page<Post> postList = postRepository.findAll(pageable);
+
+        if (postList.getTotalElements() == 0) {
+            throw new CustomException(ErrorCode.POST_EMPTY);
+        }
+
+        return postList.map(PublicPostResponseDto::new);
+    }
+
+    public void delete(Post post) {
+        postRepository.delete(post);
     }
 }

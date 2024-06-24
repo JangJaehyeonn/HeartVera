@@ -96,9 +96,25 @@ public class PublicPostService {
     );
   }
 
-  private void checkUserSame(PublicPost post, User user) {
-    if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
-      throw new CustomException(ErrorCode.POST_NOT_USER);
+    private void checkUserSame(PublicPost post, User user) {
+        if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
+            throw new CustomException(ErrorCode.POST_NOT_USER);
+        }
     }
-  }
+
+    public Object getAllPostForAdmin(int page, int amount) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page, amount, sort);
+        Page<PublicPost> postList = postRepository.findAll(pageable);
+
+        if (postList.getTotalElements() == 0) {
+            throw new CustomException(ErrorCode.POST_EMPTY);
+        }
+
+        return postList.map(PublicPostResponseDto::new);
+    }
+
+    public void delete(PublicPost post) {
+        postRepository.delete(post);
+    }
 }

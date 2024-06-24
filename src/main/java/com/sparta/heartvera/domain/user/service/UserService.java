@@ -78,6 +78,7 @@ public class UserService {
 
     }
 
+    @Transactional
     public User createUser(String userId, String userName,
                            String password, String email,
                            String description, UserRoleEnum role) {
@@ -104,7 +105,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void updateUser(User user){
+    @Transactional
+    public void updateUser(User user) {
         userRepository.save(user);
     }
 
@@ -114,6 +116,9 @@ public class UserService {
         );
     }
 
+  public List<User> findAllUser() {
+    return userRepository.findAll();
+  };
     public void findByUserName(String userName) {
         Optional<User> existingUser = userRepository.findByUserName(userName);
         if (existingUser.isPresent()) {
