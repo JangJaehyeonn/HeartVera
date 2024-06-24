@@ -73,7 +73,6 @@ public class UserService {
         user.updatePassword(passwordEncoder.encode(newPassword));
 
     }
-
     @Transactional
     public void logout(User user) {
         // 유저의 리프레쉬 토큰 초기화
@@ -81,11 +80,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private User findByUserSeq(Long userSeq) {
+    public User findByUserSeq(Long userSeq) {
         return userRepository.findById(userSeq).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
     }
 
+  public List<User> findAllUser() {
+    return userRepository.findAll();
+  };
 
 }
