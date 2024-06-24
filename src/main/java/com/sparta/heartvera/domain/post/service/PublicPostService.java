@@ -92,29 +92,38 @@ public class PublicPostService {
 
   public PublicPost findById(Long postId) {
     return postRepository.findById(postId).orElseThrow(
-        () -> new CustomException(ErrorCode.POST_NOT_FOUND)
+            () -> new CustomException(ErrorCode.POST_NOT_FOUND)
     );
   }
 
-    private void checkUserSame(PublicPost post, User user) {
-        if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
-            throw new CustomException(ErrorCode.POST_NOT_USER);
-        }
+  private void checkUserSame(PublicPost post, User user) {
+    if (!(post.getUser().getUserSeq().equals(user.getUserSeq()))) {
+      throw new CustomException(ErrorCode.POST_NOT_USER);
+    }
+  }
+
+  public Object getAllPostForAdmin(int page, int amount) {
+    Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+    Pageable pageable = PageRequest.of(page, amount, sort);
+    Page<PublicPost> postList = postRepository.findAll(pageable);
+
+    if (postList.getTotalElements() == 0) {
+      throw new CustomException(ErrorCode.POST_EMPTY);
     }
 
-    public Object getAllPostForAdmin(int page, int amount) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, amount, sort);
-        Page<PublicPost> postList = postRepository.findAll(pageable);
+    return postList.map(PublicPostResponseDto::new);
+  }
 
-        if (postList.getTotalElements() == 0) {
-            throw new CustomException(ErrorCode.POST_EMPTY);
-        }
+  public void delete(PublicPost post) {
+    postRepository.delete(post);
+  }
 
-        return postList.map(PublicPostResponseDto::new);
+  //좋아요 유효성 검사
+  public void validatePostLike(Long userId, Long postId) {
+    PublicPost post = postRepository.findById(postId).orElseThrow(()->
+            new CustomException(ErrorCode.POST_NOT_FOUND));
+    if(post.getUser().getUserSeq().equals(userId)){
+      throw new CustomException(ErrorCode.POST_SAME_USER);
     }
-
-    public void delete(PublicPost post) {
-        postRepository.delete(post);
-    }
+  }
 }

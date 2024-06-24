@@ -28,7 +28,7 @@ public class SwaggerConfig {
 
     private Info getInfo() {
         return new Info()
-                .title("HeartVera API")
+                .title("Newsfeed API")
                 .version("1.0")
                 .description("Heartvera 프로젝트의 API 문서화");
     }
