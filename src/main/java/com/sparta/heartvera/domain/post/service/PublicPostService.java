@@ -69,7 +69,7 @@ public class PublicPostService {
     return postList.map(PublicPostResponseDto::new);
   }
 
-  public List<PublicPostResponseDto> getFollowedPosts(User user, int page, int pageSize) {
+  public Object getFollowedPosts(User user, int page, int pageSize) {
     Pageable pageable = PageRequest.of(page, pageSize);
 
     User currentUser = userService.findByUserSeq(user.getUserSeq());
@@ -79,14 +79,14 @@ public class PublicPostService {
     for (Follow followerList : follows) {
       User followedUser = followerList.getToUser();
       Page<PublicPost> publicPosts = postRepository.findByUserOrderByCreatedAtDesc(followedUser, pageable);
-      if (publicPosts.isEmpty()) {
-        throw new CustomException(ErrorCode.POST_EMPTY);
-      }
       for(PublicPost publicPost : publicPosts) {
         PublicPostResponseDto responseDto = new PublicPostResponseDto(publicPost);
         publicPostResponseDtos.add(responseDto);
       }
     }
+      if (publicPostResponseDtos.isEmpty()) {
+        return "먼저 관심있는 사람들을 팔로우 해보세요!";
+      }
     return publicPostResponseDtos;
   }
 
