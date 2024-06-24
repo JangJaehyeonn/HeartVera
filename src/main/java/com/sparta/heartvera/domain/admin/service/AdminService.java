@@ -26,8 +26,8 @@ public class AdminService {
     private final UserService userService;
     private final CommentService commentService;
 
-    public Object getAllPost(int page) {
-        return postService.getAllPostForAdmin(page);
+    public Object getAllPost(int page, int amount) {
+        return postService.getAllPostForAdmin(page, amount);
     }
 
 
@@ -45,8 +45,8 @@ public class AdminService {
         return post.getId() + "번 게시글 삭제에 성공하였습니다.";
     }
 
-    public Object getAllPublicPost(int page) {
-        return publicPostService.getAllPostForAdmin(page);
+    public Object getAllPublicPost(int page, int amount) {
+        return publicPostService.getAllPostForAdmin(page, amount);
     }
 
 

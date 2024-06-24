@@ -15,8 +15,8 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/posts")
-    public ResponseEntity getAllPost(@RequestParam int page) {
-        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPost(page -1));
+    public ResponseEntity getAllPost(@RequestParam("page") int page, @RequestParam(value = "amount", defaultValue = "5") int amount) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPost(page -1, amount));
     }
 
     @PatchMapping("/posts/{postId}")
@@ -30,8 +30,8 @@ public class AdminController {
     }
 
     @GetMapping("/pubposts")
-    public ResponseEntity getAllPublicPost(@RequestParam int page) {
-        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPublicPost(page -1));
+    public ResponseEntity getAllPublicPost(@RequestParam("page") int page, @RequestParam(value = "amount", defaultValue = "5") int amount) {
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.getAllPublicPost(page -1, amount));
     }
 
     @PatchMapping("/pubposts/{postId}")

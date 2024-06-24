@@ -102,9 +102,9 @@ public class PublicPostService {
         }
     }
 
-    public Object getAllPostForAdmin(int page) {
+    public Object getAllPostForAdmin(int page, int amount) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, 5, sort);
+        Pageable pageable = PageRequest.of(page, amount, sort);
         Page<PublicPost> postList = postRepository.findAll(pageable);
 
         if (postList.getTotalElements() == 0) {
