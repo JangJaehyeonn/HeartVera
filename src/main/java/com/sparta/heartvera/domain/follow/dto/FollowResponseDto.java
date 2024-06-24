@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 public class FollowResponseDto {
-  private String userName;
+  private String userId;
 
   public FollowResponseDto(User user) {
-    this.userName = user.getUserName();
+    this.userId = user.getUserId();
   }
 }
