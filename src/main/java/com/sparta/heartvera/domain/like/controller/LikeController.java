@@ -29,7 +29,7 @@ public class LikeController {
     }
 
     // 공개 게시물별 좋아요 수 조회
-    @GetMapping("/public/{postId}/like/count")
+    @GetMapping("/pubposts/{postId}/like/count")
     public LikeCountResponseDto getPublicPostLikes(@PathVariable("postId") Long postId) {
         return new LikeCountResponseDto(likeService.getLikesCount(postId, LikeEnum.POST));
     }
@@ -47,7 +47,7 @@ public class LikeController {
     }
 
     // 공개 게시물별 좋아요 토글
-    @PostMapping("/public/{postId}/like")
+    @PostMapping("/pubposts/{postId}/like")
     public ResponseEntity<String> togglePublicPostLike(@PathVariable(name = "postId") long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return likeService.togglePublicPostLike(userDetails.getUser().getUserSeq(), postId);
     }
