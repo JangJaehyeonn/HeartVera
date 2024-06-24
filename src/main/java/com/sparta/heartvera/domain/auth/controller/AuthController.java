@@ -5,12 +5,14 @@ import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
 import com.sparta.heartvera.domain.auth.dto.TokenRequestDto;
 import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
 import com.sparta.heartvera.domain.auth.service.AuthService;
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.security.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +30,14 @@ public class AuthController {
     @Operation(summary = "회원가입",description = "ID, PW, 닉네임, 이메일, 한줄소개, 어드민 비밀번호(선택사항)를 기반으로 회원가입합니다.")
     @PostMapping(value = "/signup")
     public ResponseEntity<String> signup(@RequestBody @Valid SignupRequestDto requestDto){
-        return authService.signup(requestDto);
+        UserRoleEnum authority = authService.signup(requestDto).getAuthority();
+        if (authority == UserRoleEnum.ADMIN) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("어드민으로 회원가입이 성공적으로 완료되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("일반 사용자로 회원가입이 성공적으로 완료되었습니다.");
+        }
     }
 
     @PostMapping("/login")

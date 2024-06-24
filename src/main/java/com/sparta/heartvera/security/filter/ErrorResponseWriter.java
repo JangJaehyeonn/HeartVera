@@ -11,7 +11,7 @@ public class ErrorResponseWriter {
     protected static void writeMessageResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setStatus(errorCode.getStatus());
+        response.setStatus(errorCode.getStatus().value());
         response.getWriter().write(errorCode.getMsg());
     }
     // response body에 글로벌 성공 메시지 날리기
