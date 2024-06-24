@@ -60,6 +60,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/pubposts/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole(UserRoleEnum.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         // swagger 허용
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-resources/**, ").permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리

@@ -1,10 +1,9 @@
 package com.sparta.heartvera.domain.auth.controller;
 
-import com.sparta.heartvera.domain.auth.dto.LoginRequestDto;
-import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
-import com.sparta.heartvera.domain.auth.dto.TokenRequestDto;
-import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sparta.heartvera.domain.auth.dto.*;
 import com.sparta.heartvera.domain.auth.service.AuthService;
+import com.sparta.heartvera.domain.auth.service.KakaoService;
 import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.security.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final KakaoService kakaoService;
 
     @Operation(summary = "회원가입",description = "ID, PW, 닉네임, 이메일, 한줄소개, 어드민 비밀번호(선택사항)를 기반으로 회원가입합니다.")
     @PostMapping(value = "/signup")
@@ -57,6 +54,12 @@ public class AuthController {
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, newToken.getAccessToken());
 
         return ResponseEntity.ok().body(newToken.getAccessToken());
+    }
+
+    @GetMapping("/kakaologin")
+    public SocialUserDto kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+        SocialUserDto socialUserDto = new SocialUserDto(); // 필요한 경우 사용자가 입력한 정보를 담기 위한 DTO
+        return kakaoService.kakaoLogin(code, socialUserDto, response);
     }
 
 }
