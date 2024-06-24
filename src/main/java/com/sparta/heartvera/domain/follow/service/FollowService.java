@@ -44,7 +44,11 @@ public class FollowService {
   @Transactional(readOnly = true)
   public List<FollowResponseDto> getFollowings(User user) {
     List<FollowResponseDto> followResponseDtoList = new ArrayList<>();
-    for(Follow follow : user.getFollowings()) {
+    List<Follow> followings = user.getFollowings();
+    if (followings.isEmpty()) {
+      throw new CustomException(ErrorCode.EMPTY_FOLLOW);
+    }
+    for (Follow follow : followings) {
       followResponseDtoList.add(new FollowResponseDto(follow.getToUser()));
     }
     return followResponseDtoList;
