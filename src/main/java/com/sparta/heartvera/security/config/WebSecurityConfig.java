@@ -1,5 +1,6 @@
 package com.sparta.heartvera.security.config;
 
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import com.sparta.heartvera.domain.user.repository.UserRepository;
 import com.sparta.heartvera.security.filter.JwtAuthenticationFilter;
 import com.sparta.heartvera.security.filter.JwtAuthorizationFilter;
@@ -57,6 +58,7 @@ public class WebSecurityConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pubposts/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole(UserRoleEnum.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         // swagger 허용
