@@ -7,8 +7,7 @@
 * 개발 환경: IntelliJ
 
 <br>
-![image](https://github.com/HeartVera/HeartVera/assets/130989670/b55735bd-6cb1-41e2-ac48-f1d5eb2df94a)
-![image](https://github.com/HeartVera/HeartVera/assets/130989670/339e546e-eb4a-42ab-9f40-a84a8dcae3ad)
+
 
 
 
