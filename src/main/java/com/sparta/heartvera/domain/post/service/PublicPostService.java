@@ -11,7 +11,10 @@ import com.sparta.heartvera.domain.post.repository.PublicPostRepository;
 import com.sparta.heartvera.domain.user.entity.User;
 import com.sparta.heartvera.domain.user.service.UserService;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -74,19 +77,21 @@ public class PublicPostService {
 
     User currentUser = userService.findByUserSeq(user.getUserSeq());
     List<Follow> follows = followRepository.findByFromUser(currentUser);
+    Set<Long> userIds = follows.stream().map((follow)-> follow.getToUser().getUserSeq()).collect(
+        Collectors.toSet());
+
+    Page<PublicPost> publicPosts = postRepository.findByUser_UserSeqInOrderByCreatedAtDesc(userIds, pageable);
 
     List<PublicPostResponseDto> publicPostResponseDtos = new ArrayList<>();
-    for (Follow followerList : follows) {
-      User followedUser = followerList.getToUser();
-      Page<PublicPost> publicPosts = postRepository.findByUserOrderByCreatedAtDesc(followedUser, pageable);
-      for(PublicPost publicPost : publicPosts) {
+
+    for(PublicPost publicPost : publicPosts) {
         PublicPostResponseDto responseDto = new PublicPostResponseDto(publicPost);
         publicPostResponseDtos.add(responseDto);
-      }
     }
-      if (publicPostResponseDtos.isEmpty()) {
-        return "먼저 관심있는 사람들을 팔로우 해보세요!";
-      }
+
+    if (publicPostResponseDtos.isEmpty()) {
+      return "먼저 관심있는 사람들을 팔로우 해보세요!";
+    }
     return publicPostResponseDtos;
   }
 
