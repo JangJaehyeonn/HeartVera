@@ -28,7 +28,6 @@ public class PublicPostService {
   private final UserService userService;
   private final FollowRepository followRepository;
 
-
   public PublicPostResponseDto savePost(PostRequestDto requestDto, User user) {
     PublicPost post = postRepository.save(new PublicPost(requestDto, user));
 
@@ -103,6 +102,22 @@ public class PublicPostService {
     }
   }
 
+  public Object getAllPostForAdmin(int page, int amount) {
+    Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+    Pageable pageable = PageRequest.of(page, amount, sort);
+    Page<PublicPost> postList = postRepository.findAll(pageable);
+
+    if (postList.getTotalElements() == 0) {
+      throw new CustomException(ErrorCode.POST_EMPTY);
+    }
+
+    return postList.map(PublicPostResponseDto::new);
+  }
+
+  public void delete(PublicPost post) {
+    postRepository.delete(post);
+  }
+
   //좋아요 유효성 검사
   public void validatePostLike(Long userId, Long postId) {
     PublicPost post = postRepository.findById(postId).orElseThrow(()->
@@ -111,5 +126,4 @@ public class PublicPostService {
       throw new CustomException(ErrorCode.POST_SAME_USER);
     }
   }
-
 }

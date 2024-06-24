@@ -4,6 +4,7 @@ import com.sparta.heartvera.common.exception.CustomException;
 import com.sparta.heartvera.common.exception.ErrorCode;
 import com.sparta.heartvera.domain.comment.dto.CommentRequestDto;
 import com.sparta.heartvera.domain.comment.dto.CommentResponseDto;
+import com.sparta.heartvera.domain.comment.dto.PublicCommentResponseDto;
 import com.sparta.heartvera.domain.comment.entity.Comment;
 import com.sparta.heartvera.domain.comment.repository.CommentRepository;
 import com.sparta.heartvera.domain.post.entity.Post;
@@ -72,6 +73,10 @@ public class CommentService {
         return postService.findById(postId);
     }
 
+    public List<PublicCommentResponseDto> getAllCommentForAdmin() {
+        return commentRepository.findAll().stream().map(PublicCommentResponseDto::new).toList();
+    }
+
     //좋아요 유효성 검사
     public void validateCommentLike(Long userId, Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(()->
@@ -80,5 +85,4 @@ public class CommentService {
             throw new CustomException(ErrorCode.COMMENT_SAME_USER);
         }
     }
-
 }
