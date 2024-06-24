@@ -57,13 +57,13 @@ public class PublicPostService {
     return postId + "번 게시물 삭제 완료";
   }
 
-  public Object getAllPost(int page) {
+  public Object getAllPost(int page, int amount) {
     Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-    Pageable pageable = PageRequest.of(page, 5, sort);
+    Pageable pageable = PageRequest.of(page, amount, sort);
     Page<PublicPost> postList = postRepository.findAll(pageable);
 
     if (postList.getTotalElements() == 0) {
-      throw new CustomException(ErrorCode.POST_EMPTY);
+      return "먼저 작성하여 소식을 알려보세요!";
     }
 
     return postList.map(PublicPostResponseDto::new);
@@ -107,9 +107,9 @@ public class PublicPostService {
     Pageable pageable = PageRequest.of(page, amount, sort);
     Page<PublicPost> postList = postRepository.findAll(pageable);
 
-    if (postList.getTotalElements() == 0) {
-      throw new CustomException(ErrorCode.POST_EMPTY);
-    }
+        if (postList.getTotalElements() == 0) {
+            return "먼저 작성하여 소식을 알려보세요!";
+        }
 
     return postList.map(PublicPostResponseDto::new);
   }
