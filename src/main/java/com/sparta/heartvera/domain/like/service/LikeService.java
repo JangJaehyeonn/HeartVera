@@ -39,7 +39,7 @@ public class LikeService {
     @Transactional
     public ResponseEntity<String> togglePublicPostLike(Long userId, Long postId) {
         publicPostService.validatePostLike(userId, postId);  // PublicPostService 사용
-        return toggleLike(userId, postId, LikeEnum.POST);
+        return toggleLike(userId, postId, LikeEnum.PUBPOST);
     }
 
     // 댓글별 좋아요 toggle 기능

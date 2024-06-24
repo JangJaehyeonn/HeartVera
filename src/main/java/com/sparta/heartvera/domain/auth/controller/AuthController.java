@@ -56,6 +56,7 @@ public class AuthController {
         return ResponseEntity.ok().body(newToken.getAccessToken());
     }
 
+    @Operation(summary = "카카오 소셜 로그인",description = "카카오 계정으로 회원가입/로그인합니다.")
     @GetMapping("/kakaologin")
     public SocialUserDto kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         SocialUserDto socialUserDto = new SocialUserDto(); // 필요한 경우 사용자가 입력한 정보를 담기 위한 DTO
