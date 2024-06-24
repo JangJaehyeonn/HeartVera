@@ -79,7 +79,7 @@ public class PublicPostService {
     for (Follow followerList : follows) {
       User followedUser = followerList.getToUser();
       Page<PublicPost> publicPosts = postRepository.findByUserOrderByCreatedAtDesc(followedUser, pageable);
-      if (publicPosts.getTotalElements() == 0) {
+      if (publicPosts.isEmpty()) {
         throw new CustomException(ErrorCode.POST_EMPTY);
       }
       for(PublicPost publicPost : publicPosts) {
