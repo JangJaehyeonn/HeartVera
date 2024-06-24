@@ -7,7 +7,6 @@ import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,18 +80,10 @@ public class JwtUtil {
         try {
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
             // Response 객체에 Cookie 추가
-            Cookie cookie = new Cookie("jwt", token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(false); // HTTPS를 사용할 경우 true로 설정
-            cookie.setPath("/");
-            cookie.setMaxAge(60 * 60); // 1시간
-
-            res.addCookie(cookie);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage());
         }
         return token;
-
     }
     public void addAccessJwtToHeader(String token, HttpServletResponse res) {
         try {
