@@ -48,8 +48,8 @@ public class PublicPostController {
 
     @Operation(summary = "공개글 전체 조회",description = "공개 게시글을 전체조회합니다.(한페이지당 5개씩 조회)")
     @GetMapping("/")
-    public ResponseEntity getAllPost(@RequestParam("page") int page) {
-        return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPost(page - 1));
+    public ResponseEntity getAllPost(@RequestParam("page") int page, @RequestParam(value = "amount", defaultValue = "5") int amount) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPost(page - 1, amount));
     }
 
     @GetMapping("/followed")

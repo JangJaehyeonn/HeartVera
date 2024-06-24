@@ -50,9 +50,9 @@ public class PostService {
         return postId + "번 게시물 삭제 완료";
     }
 
-    public Object getAllPost(int page) {
+    public Object getAllPost(int page, int amount) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, 5, sort);
+        Pageable pageable = PageRequest.of(page, amount, sort);
         Page<Post> postList = postRepository.findAll(pageable);
 
         if (postList.getTotalElements() == 0) {
