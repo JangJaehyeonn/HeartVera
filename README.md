@@ -141,7 +141,7 @@
 <br>
 
 ### 🧬 ERD
-> <img src="https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Fd20fb323-d648-4e60-a973-432e99b46876%2FUntitled.png?table=block&id=4f65418f-9cc9-4a0f-b409-d68086ca5382&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=2000&userId=&cache=v2" width="500px">
+> ![image](https://github.com/HeartVera/HeartVera/assets/130989670/eccbb80c-686c-40dd-9bca-a5e591b26708)
 <br>
 
 
