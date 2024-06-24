@@ -1,13 +1,11 @@
 package com.sparta.heartvera.domain.user.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.sparta.heartvera.common.exception.CustomException;
 import com.sparta.heartvera.common.exception.ErrorCode;
@@ -23,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +56,7 @@ class UserServiceTest {
     testUser = User.builder()
         .userId("test12345")
         .userName("테스트유저")
-        .userPassword(passwordEncoder.encode("@test12345"))
+        .userPassword("@test12345")
         .userEmail("test@gmail.com")
         .description("한줄소개")
         .authority(UserRoleEnum.USER)
@@ -174,7 +171,7 @@ class UserServiceTest {
     given(requestDto.getPassword()).willReturn("@test12345");
     given(requestDto.getNewPassword()).willReturn("@password12345");
 
-    PasswordHistory recentPasswords = new PasswordHistory(testUser, passwordEncoder.encode("@password12345"), LocalDateTime.now());
+    PasswordHistory recentPasswords = new PasswordHistory(testUser,"@password12345", LocalDateTime.now());
     List<PasswordHistory> usedPasswords = new ArrayList<>();
     usedPasswords.add(recentPasswords);
 
@@ -189,5 +186,4 @@ class UserServiceTest {
 
     assertEquals(ErrorCode.RECENT_PASSWORD_MATCH, exception.getErrorCode());
   }
-
 }
