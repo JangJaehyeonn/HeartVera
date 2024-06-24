@@ -63,7 +63,7 @@ public class PublicPostService {
     Page<PublicPost> postList = postRepository.findAll(pageable);
 
     if (postList.getTotalElements() == 0) {
-      throw new CustomException(ErrorCode.POST_EMPTY);
+      return "먼저 작성하여 소식을 알려보세요!";
     }
 
     return postList.map(PublicPostResponseDto::new);
@@ -108,7 +108,7 @@ public class PublicPostService {
         Page<PublicPost> postList = postRepository.findAll(pageable);
 
         if (postList.getTotalElements() == 0) {
-            throw new CustomException(ErrorCode.POST_EMPTY);
+            return "먼저 작성하여 소식을 알려보세요!";
         }
 
         return postList.map(PublicPostResponseDto::new);
