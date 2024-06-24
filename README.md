@@ -141,7 +141,7 @@
 <br>
 
 ### 🧬 ERD
-> <img src="https://teamsparta.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F83c75a39-3aba-4ba4-a792-7aefe4b07895%2Fd20fb323-d648-4e60-a973-432e99b46876%2FUntitled.png?table=block&id=4f65418f-9cc9-4a0f-b409-d68086ca5382&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=2000&userId=&cache=v2" width="500px">
+> ![image](https://github.com/HeartVera/HeartVera/assets/130989670/eccbb80c-686c-40dd-9bca-a5e591b26708)
 <br>
 
 
@@ -168,7 +168,8 @@
 관리자의 기능들을 어떻게 구성하는 것이 좋은지 생각해볼 수 있는 좋은 시간이었습니다!
 
 #### 🌳 한해정
-
+이번 팀 프로젝트는 저에게는 언젠가는 넘어야 할 숙제 같았고, 이번 경험을 통해서 다음 숙제의 디딤돌이 되었으리라 믿으며 최선을 다했던 것 같습니다.
+많이 배우고, 느꼈습니다. 이번 계기로 조금 더 성장한 내가 되었으면 하는 바램입니다. 
 
 #### 👾 홍성도
 
