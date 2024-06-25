@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">HeartVera</a> &gt; <a href="index.source.html" class="el_package">com.sparta.heartvera.security.util</a> &gt; <span class="el_source">JwtUtil.java</span></div><h1>JwtUtil.java</h1><pre class="source lang-java linenums">package com.sparta.heartvera.security.util;
+
+import com.sparta.heartvera.common.exception.CustomException;
+import com.sparta.heartvera.common.exception.ErrorCode;
+import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
+
+@Component
+<span class="nc" id="L24">public class JwtUtil {</span>
+    // Header KEY 값
+    public static final String AUTHORIZATION_HEADER = &quot;Authorization&quot;;
+    // 사용자 권한 값의 KEY
+    public static final String AUTHORIZATION_KEY = &quot;auth&quot;;
+    // Token 식별자
+    public static final String BEARER_PREFIX = &quot;Bearer &quot;;
+    // 토큰 만료시간
+<span class="nc" id="L32">    private final long ACCESSTOKEN_TIME = 30 * 60 * 1000L; // 30분</span>
+<span class="nc" id="L33">    private final long REFRESHTOKEN_TIME = 12 * 60 * 60 * 1000L; // 12시간</span>
+
+    @Value(&quot;${jwt.secret.key}&quot;) // Base64 Encode 한 SecretKey
+    private String secretKey;
+    private Key key;
+<span class="nc" id="L38">    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;</span>
+
+    // 로그 설정
+<span class="nc" id="L41">    public static final Logger logger = LoggerFactory.getLogger(&quot;JWT 관련 로그&quot;);</span>
+
+    @PostConstruct
+    public void init() {
+<span class="nc" id="L45">        byte[] bytes = Base64.getDecoder().decode(secretKey);</span>
+<span class="nc" id="L46">        key = Keys.hmacShaKeyFor(bytes);</span>
+<span class="nc" id="L47">    }</span>
+
+    // 토큰 생성
+    public TokenResponseDto createToken(String userId, UserRoleEnum role) {
+<span class="nc" id="L51">        Date date = new Date();</span>
+
+        String accessToken = BEARER_PREFIX +
+<span class="nc" id="L54">                Jwts.builder()</span>
+<span class="nc" id="L55">                        .setSubject(userId) // 사용자 식별자값(ID)</span>
+<span class="nc" id="L56">                        .claim(AUTHORIZATION_KEY, role) // 사용자 권한</span>
+<span class="nc" id="L57">                        .setExpiration(new Date(date.getTime() + ACCESSTOKEN_TIME)) // 만료 시간</span>
+<span class="nc" id="L58">                        .setIssuedAt(date) // 발급일</span>
+<span class="nc" id="L59">                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘</span>
+<span class="nc" id="L60">                        .compact();</span>
+
+        String refreshToken = BEARER_PREFIX +
+<span class="nc" id="L63">                Jwts.builder()</span>
+<span class="nc" id="L64">                        .setSubject(userId) // 사용자 식별자값(ID)</span>
+<span class="nc" id="L65">                        .claim(AUTHORIZATION_KEY, role) // 사용자 권한</span>
+<span class="nc" id="L66">                        .setExpiration(new Date(date.getTime() + REFRESHTOKEN_TIME)) // 만료 시간</span>
+<span class="nc" id="L67">                        .setIssuedAt(date) // 발급일</span>
+<span class="nc" id="L68">                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘</span>
+<span class="nc" id="L69">                        .compact();</span>
+
+<span class="nc" id="L71">        return TokenResponseDto.builder()</span>
+<span class="nc" id="L72">                .grantType(role)</span>
+<span class="nc" id="L73">                .accessToken(accessToken)</span>
+<span class="nc" id="L74">                .refreshToken(refreshToken)</span>
+<span class="nc" id="L75">                .key(userId).build();</span>
+    }
+
+    // JWT Cookie 에 저장
+    public String addJwtToCookie(String token, HttpServletResponse res) {
+        try {
+<span class="nc" id="L81">            token = URLEncoder.encode(token, &quot;utf-8&quot;).replaceAll(&quot;\\+&quot;, &quot;%20&quot;); // Cookie Value 에는 공백이 불가능해서 encoding 진행</span>
+            // Response 객체에 Cookie 추가
+<span class="nc" id="L83">        } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L84">            logger.error(e.getMessage());</span>
+<span class="nc" id="L85">        }</span>
+<span class="nc" id="L86">        return token;</span>
+    }
+    public void addAccessJwtToHeader(String token, HttpServletResponse res) {
+        try {
+<span class="nc" id="L90">            token = URLEncoder.encode(token, &quot;utf-8&quot;).replaceAll(&quot;\\+&quot;, &quot;%20&quot;); // Cookie Value 에는 공백이 불가능해서 encoding 진행</span>
+
+<span class="nc" id="L92">            res.setHeader(AUTHORIZATION_HEADER, token);</span>
+<span class="nc" id="L93">        } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L94">            logger.error(e.getMessage());</span>
+<span class="nc" id="L95">        }</span>
+<span class="nc" id="L96">    }</span>
+
+
+
+    // JWT 토큰 substring
+    public String substringToken(String tokenValue) {
+<span class="nc bnc" id="L102" title="All 4 branches missed.">        if (StringUtils.hasText(tokenValue) &amp;&amp; tokenValue.startsWith(BEARER_PREFIX)) {</span>
+<span class="nc" id="L103">            return tokenValue.substring(7);</span>
+        }
+<span class="nc" id="L105">        logger.error(&quot;Not Found Token&quot;);</span>
+<span class="nc" id="L106">        throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);</span>
+    }
+
+    // 토큰 검증
+    public boolean validateToken(String token) {
+        try {
+<span class="nc" id="L112">            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);</span>
+<span class="nc" id="L113">            return true;</span>
+<span class="nc" id="L114">        } catch (SecurityException | MalformedJwtException | SignatureException e) {</span>
+<span class="nc" id="L115">            logger.error(&quot;Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.&quot;);</span>
+<span class="nc" id="L116">        } catch (ExpiredJwtException e) {</span>
+<span class="nc" id="L117">            logger.error(&quot;Expired JWT token, 만료된 JWT token 입니다.&quot;);</span>
+<span class="nc" id="L118">        } catch (UnsupportedJwtException e) {</span>
+<span class="nc" id="L119">            logger.error(&quot;Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.&quot;);</span>
+<span class="nc" id="L120">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L121">            logger.error(&quot;JWT claims is empty, 잘못된 JWT 토큰 입니다.&quot;);</span>
+<span class="nc" id="L122">        }</span>
+<span class="nc" id="L123">        return false;</span>
+    }
+
+    // 토큰에서 사용자 정보 가져오기
+    public Claims getUserInfoFromToken(String token) {
+<span class="nc" id="L128">        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

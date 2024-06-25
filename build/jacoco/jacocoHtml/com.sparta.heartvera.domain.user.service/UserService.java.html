@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">HeartVera</a> &gt; <a href="index.source.html" class="el_package">com.sparta.heartvera.domain.user.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.sparta.heartvera.domain.user.service;
+
+import com.sparta.heartvera.common.exception.CustomException;
+import com.sparta.heartvera.common.exception.ErrorCode;
+import com.sparta.heartvera.domain.user.dto.UserPwRequestDto;
+import com.sparta.heartvera.domain.user.dto.UserRequestDto;
+import com.sparta.heartvera.domain.user.dto.UserResponseDto;
+import com.sparta.heartvera.domain.user.entity.PasswordHistory;
+import com.sparta.heartvera.domain.user.entity.User;
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
+import com.sparta.heartvera.domain.user.repository.PasswordHistoryRepository;
+import com.sparta.heartvera.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static com.sparta.heartvera.common.exception.ErrorCode.USER_NOT_UNIQUE;
+
+@Service
+<span class="fc" id="L25">@RequiredArgsConstructor</span>
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final PasswordHistoryRepository passwordHistoryRepository;
+
+    // 사용자 프로필 조회
+    public UserResponseDto getUser(Long userSeq) {
+<span class="fc" id="L34">        User user = findByUserSeq(userSeq);</span>
+<span class="fc" id="L35">        return new UserResponseDto(user);</span>
+    }
+
+    // 사용자 프로필 수정
+    @Transactional
+    public UserResponseDto updateUser(UserRequestDto requestDto, Long userSeq) {
+<span class="fc" id="L41">        User user = findByUserSeq(userSeq);</span>
+<span class="fc" id="L42">        user.updateUser(requestDto);</span>
+<span class="fc" id="L43">        return new UserResponseDto(user);</span>
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public void updatePassword(UserPwRequestDto requestDto, Long userSeq) {
+<span class="fc" id="L49">        User user = findByUserSeq(userSeq);</span>
+<span class="fc" id="L50">        String password = requestDto.getPassword();</span>
+<span class="fc" id="L51">        String newPassword = requestDto.getNewPassword();</span>
+
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if (!passwordEncoder.matches(password, user.getUserPassword())) {</span>
+<span class="nc" id="L54">            throw new CustomException(ErrorCode.CURRENT_PASSWORD_MATCH);</span>
+        }
+
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (passwordEncoder.matches(newPassword, user.getUserPassword())) {</span>
+<span class="fc" id="L58">            throw new CustomException(ErrorCode.SAME_NEW_PASSWORD);</span>
+        }
+
+<span class="fc" id="L61">        List&lt;PasswordHistory&gt; usedPasswords = passwordHistoryRepository.findTop3ByUserOrderByChangedAtDesc(</span>
+                user);
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        for (PasswordHistory usedPassword : usedPasswords) {</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">            if (passwordEncoder.matches(newPassword, usedPassword.getPassword())) {</span>
+<span class="nc" id="L65">                throw new CustomException(ErrorCode.RECENT_PASSWORD_MATCH);</span>
+            }
+<span class="nc" id="L67">        }</span>
+
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (usedPasswords.size() &gt;= 3) {</span>
+<span class="nc" id="L70">            PasswordHistory oldPassword = usedPasswords.get(usedPasswords.size() - 1);</span>
+<span class="nc" id="L71">            passwordHistoryRepository.delete(oldPassword);</span>
+        }
+
+<span class="fc" id="L74">        PasswordHistory newPasswordHistory = new PasswordHistory(user, passwordEncoder.encode(newPassword), LocalDateTime.now());</span>
+<span class="fc" id="L75">        passwordHistoryRepository.save(newPasswordHistory);</span>
+
+<span class="fc" id="L77">        user.updatePassword(passwordEncoder.encode(newPassword));</span>
+
+<span class="fc" id="L79">    }</span>
+
+    @Transactional
+    public User createUser(String userId, String userName,
+                           String password, String email,
+                           String description, UserRoleEnum role) {
+        // 유저 Entity 생성
+<span class="nc" id="L86">        User user = User.builder()</span>
+<span class="nc" id="L87">                .userId(userId)</span>
+<span class="nc" id="L88">                .userName(userName)</span>
+<span class="nc" id="L89">                .userPassword(password)</span>
+<span class="nc" id="L90">                .userEmail(email)</span>
+<span class="nc" id="L91">                .description(description)</span>
+<span class="nc" id="L92">                .authority(role)</span>
+<span class="nc" id="L93">                .build();</span>
+
+        // 유저 DB 생성
+<span class="nc" id="L96">        userRepository.save(user);</span>
+
+<span class="nc" id="L98">        return user;</span>
+    }
+
+    @Transactional
+    public void logout(User user) {
+        // 유저의 리프레쉬 토큰 초기화
+<span class="nc" id="L104">        user.setRefreshToken(null);</span>
+<span class="nc" id="L105">        userRepository.save(user);</span>
+<span class="nc" id="L106">    }</span>
+
+    @Transactional
+    public void updateUser(User user) {
+<span class="nc" id="L110">        userRepository.save(user);</span>
+<span class="nc" id="L111">    }</span>
+
+    public User findByUserSeq(Long userSeq) {
+<span class="fc" id="L114">        return userRepository.findById(userSeq).orElseThrow(() -&gt;</span>
+<span class="nc" id="L115">                new CustomException(ErrorCode.USER_NOT_FOUND)</span>
+        );
+    }
+
+  public List&lt;User&gt; findAllUser() {
+<span class="nc" id="L120">    return userRepository.findAll();</span>
+  };
+    public void findByUserName(String userName) {
+<span class="nc" id="L123">        Optional&lt;User&gt; existingUser = userRepository.findByUserName(userName);</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        if (existingUser.isPresent()) {</span>
+<span class="nc" id="L125">            throw new CustomException(USER_NOT_UNIQUE);</span>
+        }
+<span class="nc" id="L127">    }</span>
+
+    public User findByRefreshToken(String refreshToken) {
+<span class="nc" id="L130">        User user = userRepository.findByRefreshToken(refreshToken).orElseThrow(</span>
+<span class="nc" id="L131">                () -&gt; new CustomException(ErrorCode.USER_NOT_FOUND)</span>
+        );
+<span class="nc" id="L133">        return user;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

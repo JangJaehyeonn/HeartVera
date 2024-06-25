@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">HeartVera</a> &gt; <a href="index.source.html" class="el_package">com.sparta.heartvera.domain.auth.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.sparta.heartvera.domain.auth.service;
+
+import com.sparta.heartvera.common.exception.CustomException;
+import com.sparta.heartvera.common.exception.ErrorCode;
+import com.sparta.heartvera.domain.auth.dto.SignupRequestDto;
+import com.sparta.heartvera.domain.auth.dto.SignupResponseDto;
+import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
+import com.sparta.heartvera.domain.user.entity.User;
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
+import com.sparta.heartvera.domain.user.repository.UserRepository;
+import com.sparta.heartvera.domain.user.service.UserService;
+import com.sparta.heartvera.security.util.JwtUtil;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+import static com.sparta.heartvera.common.exception.ErrorCode.USER_NOT_UNIQUE;
+
+<span class="nc" id="L26">@Slf4j</span>
+@Service
+<span class="nc" id="L28">@RequiredArgsConstructor</span>
+public class AuthService {
+
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    @Value(&quot;${ADMIN_TOKEN}&quot;)
+    private String adminToken;
+
+    public SignupResponseDto signup(SignupRequestDto request) {
+<span class="nc" id="L39">        String userId = request.getUserId();</span>
+<span class="nc" id="L40">        String userName = request.getUserName();</span>
+<span class="nc" id="L41">        String password = encodePassword(request.getPassword());</span>
+<span class="nc" id="L42">        String email = request.getEmail();</span>
+<span class="nc" id="L43">        String description = request.getDescription();</span>
+<span class="nc" id="L44">        String adminPassword = request.getAdminPassword();</span>
+
+        // 회원 아이디 중복 확인
+<span class="nc" id="L47">        userService.findByUserName(userId);</span>
+
+        // 사용자 ROLE 기본 USER로 설정
+<span class="nc" id="L50">        UserRoleEnum authority = determineUserRole(adminPassword);</span>
+
+        // 사용자 등록
+<span class="nc" id="L53">        User user = userService.createUser(userId, userName, password, email, description, authority); // user service</span>
+
+<span class="nc" id="L55">        return new SignupResponseDto(user);</span>
+    }
+
+    @Transactional
+    public TokenResponseDto reAuth(String refreshToken) {
+<span class="nc" id="L60">        String subToken = jwtUtil.substringToken(refreshToken);</span>
+<span class="nc" id="L61">        User user = userService.findByRefreshToken(refreshToken); // 리프레쉬 토큰 검증</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if(!jwtUtil.validateToken(subToken)) {</span>
+<span class="nc" id="L63">            throw new CustomException(ErrorCode.TOKEN_EXPIRED);</span>
+        } // 올바른 토큰이 아닐 경우
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if(jwtUtil.substringToken(refreshToken).equals(user.getRefreshToken())) {</span>
+<span class="nc" id="L66">            throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);</span>
+        }
+
+        // 리프레쉬 토큰에서 userId 꺼내오기
+<span class="nc" id="L70">        String userId = jwtUtil.getUserInfoFromToken(subToken).getSubject();</span>
+        // jwtUtil.createToken 에서 액세스 토큰, 리프레쉬 토큰 재생성
+<span class="nc" id="L72">        TokenResponseDto token = jwtUtil.createToken(userId, user.getAuthority());</span>
+        // 유저 DB refresh token 값 변경
+<span class="nc" id="L74">        user.setRefreshToken(token.getRefreshToken());</span>
+<span class="nc" id="L75">        userService.updateUser(user);</span>
+
+<span class="nc" id="L77">        return jwtUtil.createToken(userId, user.getAuthority());</span>
+    }
+
+    private String encodePassword(String password) {
+<span class="nc" id="L81">        return passwordEncoder.encode(password);</span>
+    }
+
+    private UserRoleEnum determineUserRole(String adminPassword) {
+<span class="nc bnc" id="L85" title="All 4 branches missed.">        if (adminPassword != null &amp;&amp; adminPassword.equals(adminToken)) {</span>
+<span class="nc" id="L86">            return UserRoleEnum.ADMIN;</span>
+        }
+<span class="nc" id="L88">        return UserRoleEnum.USER;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

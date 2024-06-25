@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthenticationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">HeartVera</a> &gt; <a href="index.source.html" class="el_package">com.sparta.heartvera.security.filter</a> &gt; <span class="el_source">JwtAuthenticationFilter.java</span></div><h1>JwtAuthenticationFilter.java</h1><pre class="source lang-java linenums">package com.sparta.heartvera.security.filter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.heartvera.common.exception.ErrorCode;
+import com.sparta.heartvera.domain.auth.dto.LoginRequestDto;
+import com.sparta.heartvera.domain.auth.dto.TokenResponseDto;
+import com.sparta.heartvera.domain.user.entity.UserRoleEnum;
+import com.sparta.heartvera.domain.user.repository.UserRepository;
+import com.sparta.heartvera.security.service.UserDetailsImpl;
+import com.sparta.heartvera.security.util.JwtUtil;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+<span class="nc" id="L27">@Slf4j(topic = &quot;로그인 및 JWT 생성&quot;)</span>
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+
+<span class="nc" id="L32">    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository) {</span>
+<span class="nc" id="L33">        this.jwtUtil = jwtUtil;</span>
+<span class="nc" id="L34">        this.userRepository = userRepository;</span>
+
+<span class="nc" id="L36">        setFilterProcessesUrl(&quot;/api/auth/login&quot;);</span>
+<span class="nc" id="L37">    }</span>
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+<span class="nc" id="L41">        log.info(&quot;로그인 시도&quot;);</span>
+        try {
+<span class="nc" id="L43">            LoginRequestDto UserServiceReqDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class); // httpServletRequest의 request를 LoginRequestDto로 변환</span>
+
+<span class="nc" id="L45">            return getAuthenticationManager().authenticate( // 인증객체 만들기.</span>
+                    new UsernamePasswordAuthenticationToken(
+<span class="nc" id="L47">                            UserServiceReqDto.getUserId(),</span>
+<span class="nc" id="L48">                            UserServiceReqDto.getPassword(),</span>
+                            null
+                    )
+            );
+<span class="nc" id="L52">        } catch (IOException e) {</span>
+<span class="nc" id="L53">            log.error(e.getMessage());</span>
+<span class="nc" id="L54">            throw new RuntimeException(e.getMessage());</span>
+        }
+    }
+
+    // 콜백메서드
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+<span class="nc" id="L61">        log.info(&quot;로그인 성공 및 JWT 생성&quot;);</span>
+
+<span class="nc" id="L63">        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();</span>
+<span class="nc" id="L64">        UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getAuthority();</span>
+<span class="nc" id="L65">        TokenResponseDto tokenResponse = jwtUtil.createToken(username, role);</span>
+
+        // 액세스 토큰 헤더에 추가
+<span class="nc" id="L68">        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, tokenResponse.getAccessToken());</span>
+
+        // 리프래쉬 토큰 유저 DB에 추가
+<span class="nc" id="L71">        userRepository.findByUserId(username).ifPresent(</span>
+                user -&gt; {
+<span class="nc" id="L73">                    user.setRefreshToken(tokenResponse.getRefreshToken());</span>
+<span class="nc" id="L74">                    userRepository.save(user);</span>
+<span class="nc" id="L75">                }</span>
+        );
+
+        // 설정된 메시지와 상태 코드 반환
+<span class="nc" id="L79">        response.setStatus(HttpStatus.OK.value());</span>
+<span class="nc" id="L80">        ErrorResponseWriter.writeMessageResponse(response, &quot;로그인을 성공하였습니다.&quot;);</span>
+<span class="nc" id="L81">    }</span>
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+<span class="nc" id="L85">        log.info(&quot;로그인 실패&quot;);</span>
+
+        // 설정된 메시지와 상태 코드 response body로 반환
+<span class="nc" id="L88">        ErrorResponseWriter.writeMessageResponse(response, ErrorCode.USER_NOT_FOUND);</span>
+<span class="nc" id="L89">    }</span>
+
+    @Override
+    public void doFilter(ServletRequest request,
+                         ServletResponse response,
+                         FilterChain chain) throws IOException, ServletException {
+<span class="nc" id="L95">        HttpServletRequest req = (HttpServletRequest) request;</span>
+<span class="nc" id="L96">        String uri = req.getRequestURI();</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if (uri.startsWith(&quot;/api/user&quot;)) {</span>
+<span class="nc" id="L98">            chain.doFilter(request, response);</span>
+<span class="nc" id="L99">            return;</span>
+        }
+<span class="nc" id="L101">        super.doFilter(request, response, chain);</span>
+
+<span class="nc" id="L103">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
