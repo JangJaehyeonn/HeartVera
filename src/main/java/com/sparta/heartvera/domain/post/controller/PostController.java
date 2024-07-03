@@ -49,4 +49,6 @@ public class PostController {
     public ResponseEntity getAllPost(@RequestParam("page") int page, @RequestParam(value = "amount", defaultValue = "5") int amount) {
         return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPost(page - 1, amount));
     }
+
+
 }

@@ -4,14 +4,21 @@ import com.sparta.heartvera.domain.comment.service.CommentService;
 import com.sparta.heartvera.domain.like.entity.Like;
 import com.sparta.heartvera.domain.like.entity.LikeEnum;
 import com.sparta.heartvera.domain.like.repository.LikeRepository;
+import com.sparta.heartvera.domain.post.dto.PostResponseDto;
+import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.post.service.PostService;
 import com.sparta.heartvera.domain.post.service.PublicPostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +72,18 @@ public class LikeService {
     // 좋아요 객체 찾기
     private Optional<Like> findLike(Long userId, Long contentId, LikeEnum contentType) {
         return likeRepository.findByUserIdAndContentIdAndContentType(userId, contentId, contentType);
+    }
+
+    // 사용자가 좋아요 한 게시글 목록 조회
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getUserLikedPosts(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId, pageable);
+        List<Post> likedPosts = likedPostIds.getContent().stream()
+                .map(postService::findById)
+                .collect(Collectors.toList());
+        return likedPosts.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package com.sparta.heartvera.domain.like.controller;
 import com.sparta.heartvera.domain.like.dto.LikeCountResponseDto;
 import com.sparta.heartvera.domain.like.entity.LikeEnum;
 import com.sparta.heartvera.domain.like.service.LikeService;
+import com.sparta.heartvera.domain.post.dto.PostResponseDto;
 import com.sparta.heartvera.security.service.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,6 +62,15 @@ public class LikeController {
     @PostMapping("/pubposts/{postId}/like")
     public ResponseEntity<String> togglePublicPostLike(@PathVariable(name = "postId") long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return likeService.togglePublicPostLike(userDetails.getUser().getUserSeq(), postId);
+    }
+
+    // 사용자가 좋아요 한 게시글 목록 조회
+    @Operation(summary = "사용자가 좋아요 한 게시글 목록 조회", description = "사용자가 좋아요 한 게시글 목록을 조회합니다.")
+    @GetMapping("/liked-posts")
+    public List<PostResponseDto> getUserLikedPosts(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "5") int size) {
+        return likeService.getUserLikedPosts(userDetails.getUser().getUserSeq(), page, size);
     }
 
 }
