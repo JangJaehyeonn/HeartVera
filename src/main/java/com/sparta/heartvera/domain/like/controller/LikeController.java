@@ -1,5 +1,6 @@
 package com.sparta.heartvera.domain.like.controller;
 
+import com.sparta.heartvera.domain.comment.dto.CommentResponseDto;
 import com.sparta.heartvera.domain.like.dto.LikeCountResponseDto;
 import com.sparta.heartvera.domain.like.entity.LikeEnum;
 import com.sparta.heartvera.domain.like.service.LikeService;
@@ -8,6 +9,7 @@ import com.sparta.heartvera.security.service.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -66,11 +68,21 @@ public class LikeController {
 
     // 사용자가 좋아요 한 게시글 목록 조회
     @Operation(summary = "사용자가 좋아요 한 게시글 목록 조회", description = "사용자가 좋아요 한 게시글 목록을 조회합니다.")
-    @GetMapping("/liked-posts")
+    @GetMapping("/like-posts")
     public List<PostResponseDto> getUserLikedPosts(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                    @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "5") int size) {
         return likeService.getUserLikedPosts(userDetails.getUser().getUserSeq(), page, size);
+    }
+
+    // 사용자가 좋아요 한 댓글 목록 조회
+    @Operation(summary = "사용자가 좋아요 한 댓글 목록 조회", description = "사용자가 좋아요 한 댓글 목록을 조회합니다.")
+    @GetMapping("/like-comments")
+    public Page<CommentResponseDto> getUserLikedComments(@RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "5") int size,
+                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUser().getUserSeq();
+        return likeService.getUserLikedComments(userId, page, size);
     }
 
 }

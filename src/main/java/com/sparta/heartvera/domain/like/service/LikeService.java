@@ -1,5 +1,7 @@
 package com.sparta.heartvera.domain.like.service;
 
+import com.sparta.heartvera.domain.comment.dto.CommentResponseDto;
+import com.sparta.heartvera.domain.comment.repository.CommentRepository;
 import com.sparta.heartvera.domain.comment.service.CommentService;
 import com.sparta.heartvera.domain.like.entity.Like;
 import com.sparta.heartvera.domain.like.entity.LikeEnum;
@@ -10,6 +12,7 @@ import com.sparta.heartvera.domain.post.service.PostService;
 import com.sparta.heartvera.domain.post.service.PublicPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +28,19 @@ import java.util.stream.Collectors;
 public class LikeService {
 
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
     private final PostService postService;
     private final CommentService commentService;
     private final PublicPostService publicPostService;
 
+
+    public int countUserLikedPosts(Long userId) {
+        return likeRepository.countByUserIdAndContentType(userId, LikeEnum.POST);
+    }
+
+    public int countUserLikedComments(Long userId) {
+        return likeRepository.countByUserIdAndContentType(userId, LikeEnum.COMMENT);
+    }
 
     // 게시물, 댓글별 좋아요 수 count
     public int getLikesCount(Long contentId, LikeEnum contentType) {
@@ -86,4 +98,21 @@ public class LikeService {
                 .map(PostResponseDto::new)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public Page<CommentResponseDto> getUserLikedComments(Long userId, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        List<Like> likes = likeRepository.findByUserIdAndContentType(userId, LikeEnum.COMMENT);
+        List<CommentResponseDto> likedComments = likes.stream()
+                .map(like -> commentRepository.findById(like.getContentId())
+                        .map(CommentResponseDto::new)
+                        .orElse(null))
+                .filter(comment -> comment != null)
+                .sorted((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()))
+                .collect(Collectors.toList());
+        int start = Math.min((int)pageRequest.getOffset(), likedComments.size());
+        int end = Math.min((start + pageRequest.getPageSize()), likedComments.size());
+        return new PageImpl<>(likedComments.subList(start, end), pageRequest, likedComments.size());
+    }
+
 }

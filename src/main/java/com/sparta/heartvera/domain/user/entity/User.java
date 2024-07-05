@@ -1,23 +1,19 @@
 package com.sparta.heartvera.domain.user.entity;
 
 import com.sparta.heartvera.common.Timestamped;
+import com.sparta.heartvera.domain.comment.entity.Comment;
 import com.sparta.heartvera.domain.follow.entity.Follow;
+import com.sparta.heartvera.domain.post.entity.Post;
 import com.sparta.heartvera.domain.user.dto.UserRequestDto;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -71,10 +67,18 @@ public class User extends Timestamped {
   @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
   private List<Follow> followings;
 
+  @ManyToMany(fetch = FetchType.LAZY)
+  private Set<Post> likedPosts;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  private Set<Comment> likedComments;
+
+
   public void updateUser(UserRequestDto requestDto) {
     this.userName = requestDto.getUserName();
     this.description = requestDto.getDescription();
   }
+
 
   public void updatePassword(String newPassword) {
     this.userPassword = newPassword;
@@ -86,4 +90,7 @@ public class User extends Timestamped {
     }
 
   public void setUserRole(UserRoleEnum role) { this.authority = role; }
+
+
+
 }

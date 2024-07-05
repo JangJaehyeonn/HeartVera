@@ -29,18 +29,33 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final PasswordHistoryRepository passwordHistoryRepository;
 
+
+    // 사용자의 좋아요한 게시글 수 계산
+    private int countLikedPosts(Long userId) {
+        return userRepository.countLikedPostsById(userId);
+    }
+
+    // 사용자의 좋아요한 댓글 수 계산
+    private int countLikedComments(Long userId) {
+        return userRepository.countLikedCommentsById(userId);
+    }
+
     // 사용자 프로필 조회
     public UserResponseDto getUser(Long userSeq) {
         User user = findByUserSeq(userSeq);
-        return new UserResponseDto(user);
+        int likedPostsCount = userRepository.countLikedPostsById(userSeq);
+        int likedCommentsCount = userRepository.countLikedCommentsById(userSeq);
+        return new UserResponseDto(user, likedPostsCount, likedCommentsCount);
     }
+
+
 
     // 사용자 프로필 수정
     @Transactional
     public UserResponseDto updateUser(UserRequestDto requestDto, Long userSeq) {
         User user = findByUserSeq(userSeq);
         user.updateUser(requestDto);
-        return new UserResponseDto(user);
+        return new UserResponseDto(user,countLikedPosts(userSeq), countLikedComments(userSeq));
     }
 
     // 비밀번호 변경

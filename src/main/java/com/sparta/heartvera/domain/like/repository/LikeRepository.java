@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
@@ -19,4 +20,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Page<Long> findLikedPostIdsByUserId(Long userId, Pageable pageable);
 
 
+    List<Like> findByUserIdAndContentType(Long userId, LikeEnum likeEnum);
+
+    int countByUserIdAndContentType(Long userId, LikeEnum likeEnum);
 }
